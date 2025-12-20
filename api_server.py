@@ -421,7 +421,17 @@ def add_text():
         transform_y (float, optional): Y position (-1 to 1), default 0
         bold (bool, optional): Bold text, default False
         italic (bool, optional): Italic text, default False
+        underline (bool, optional): Underline text, default False
         vertical (bool, optional): Vertical text, default False
+        align (int, optional): Text alignment 0=left, 1=center, 2=right, default 0
+        letter_spacing (int, optional): Letter spacing, default 0
+        line_spacing (int, optional): Line spacing, default 0
+        auto_wrapping (bool, optional): Auto line wrapping, default False
+        max_line_width (float, optional): Max line width ratio 0-1, default 0.82
+        alpha (float, optional): Text opacity 0-1, default 1.0
+        border (object, optional): Text border settings {color, alpha, width}
+        background (object, optional): Text background settings {color, style, alpha, round_radius, height, width, horizontal_offset, vertical_offset}
+        shadow (object, optional): Text shadow settings {color, alpha, diffuse, distance, angle}
         track_name (str, optional): Track name
     """
     try:
@@ -440,7 +450,7 @@ def add_text():
         
         script, _, _ = draft_data
         
-        # Parse parameters
+        # Parse basic parameters
         start = data.get('start', 0)
         duration = data.get('duration', 5.0)
         font = data.get('font')
@@ -450,21 +460,33 @@ def add_text():
         transform_y = data.get('transform_y', 0)
         bold = data.get('bold', False)
         italic = data.get('italic', False)
+        underline = data.get('underline', False)
         vertical = data.get('vertical', False)
+        align = data.get('align', 0)
+        letter_spacing = data.get('letter_spacing', 0)
+        line_spacing = data.get('line_spacing', 0)
+        auto_wrapping = data.get('auto_wrapping', False)
+        max_line_width = data.get('max_line_width', 0.82)
         alpha = data.get('alpha', 1.0)
         track_name = data.get('track_name')
         
         # Parse color
         color = hex_to_rgb(font_color)
         
-        # Create text style
+        # Create text style with all parameters
         text_style = cc.TextStyle(
             size=font_size,
             bold=bold,
             italic=italic,
+            underline=underline,
             color=color,
             alpha=alpha,
-            vertical=vertical
+            align=align,
+            vertical=vertical,
+            letter_spacing=letter_spacing,
+            line_spacing=line_spacing,
+            auto_wrapping=auto_wrapping,
+            max_line_width=max_line_width
         )
         
         # Create clip settings
@@ -481,13 +503,55 @@ def add_text():
             except:
                 pass
         
+        # Parse border settings
+        border = None
+        border_config = data.get('border')
+        if border_config:
+            border_color = hex_to_rgb(border_config.get('color', '#000000'))
+            border = cc.TextBorder(
+                alpha=border_config.get('alpha', 1.0),
+                color=border_color,
+                width=border_config.get('width', 40.0)
+            )
+        
+        # Parse background settings
+        background = None
+        bg_config = data.get('background')
+        if bg_config:
+            background = cc.TextBackground(
+                color=bg_config.get('color', '#000000'),
+                style=bg_config.get('style', 1),
+                alpha=bg_config.get('alpha', 1.0),
+                round_radius=bg_config.get('round_radius', 0.0),
+                height=bg_config.get('height', 0.14),
+                width=bg_config.get('width', 0.14),
+                horizontal_offset=bg_config.get('horizontal_offset', 0.5),
+                vertical_offset=bg_config.get('vertical_offset', 0.5)
+            )
+        
+        # Parse shadow settings
+        shadow = None
+        shadow_config = data.get('shadow')
+        if shadow_config:
+            shadow_color = hex_to_rgb(shadow_config.get('color', '#000000'))
+            shadow = cc.TextShadow(
+                alpha=shadow_config.get('alpha', 1.0),
+                color=shadow_color,
+                diffuse=shadow_config.get('diffuse', 15.0),
+                distance=shadow_config.get('distance', 5.0),
+                angle=shadow_config.get('angle', -45.0)
+            )
+        
         # Create text segment
         text_seg = cc.TextSegment(
             text,
             trange(int(start * SEC), int(duration * SEC)),
             font=font_type,
             style=text_style,
-            clip_settings=clip_settings
+            clip_settings=clip_settings,
+            border=border,
+            background=background,
+            shadow=shadow
         )
         
         # Add to script
@@ -1453,6 +1517,14 @@ def add_mask():
         draft_id (str): The draft ID
         mask_type (str): Mask type name from MaskType
         segment_index (int, optional): Index of the video segment (0-based), default 0
+        center_x (float, optional): Mask center X position in pixels, default 0 (center)
+        center_y (float, optional): Mask center Y position in pixels, default 0 (center)
+        size (float, optional): Main size as ratio of material height, default 0.5
+        rotation (float, optional): Rotation in degrees, default 0
+        feather (float, optional): Feather amount 0-100, default 0
+        invert (bool, optional): Invert the mask, default False
+        rect_width (float, optional): Rectangle width (only for rectangle mask)
+        round_corner (float, optional): Round corner 0-100 (only for rectangle mask)
         track_name (str, optional): Video track name
     """
     try:
@@ -1473,6 +1545,14 @@ def add_mask():
         
         # Parse parameters
         segment_index = data.get('segment_index', 0)
+        center_x = data.get('center_x', 0.0)
+        center_y = data.get('center_y', 0.0)
+        size = data.get('size', 0.5)
+        rotation = data.get('rotation', 0.0)
+        feather = data.get('feather', 0.0)
+        invert = data.get('invert', False)
+        rect_width = data.get('rect_width')
+        round_corner = data.get('round_corner')
         track_name = data.get('track_name')
         
         # Get mask type
@@ -1494,9 +1574,19 @@ def add_mask():
         if segment_index >= len(video_track.segments):
             return make_response(False, error=f"Segment index {segment_index} out of range (0-{len(video_track.segments)-1})")
         
-        # Add mask to the segment
+        # Add mask to the segment with all parameters
         segment = video_track.segments[segment_index]
-        segment.add_mask(mask_type)
+        segment.add_mask(
+            mask_type,
+            center_x=center_x,
+            center_y=center_y,
+            size=size,
+            rotation=rotation,
+            feather=feather,
+            invert=invert,
+            rect_width=rect_width,
+            round_corner=round_corner
+        )
         
         # Add mask material to script
         if segment.mask is not None:
@@ -1579,15 +1669,17 @@ def add_audio_fade():
 
 @app.route('/add_text_animation', methods=['POST'])
 def add_text_animation():
-    """Add intro/outro animation to a text segment
+    """Add intro/outro/loop animation to a text segment
     
     Request body:
         draft_id (str): The draft ID
-        animation_type (str): Animation type name from TextIntro or TextOutro
-        animation_category (str, optional): 'intro' or 'outro', default 'intro'
+        animation_type (str): Animation type name from TextIntro, TextOutro, or TextLoopAnim
+        animation_category (str, optional): 'intro', 'outro', or 'loop', default 'intro'
         segment_index (int, optional): Index of the text segment (0-based), default 0
-        duration (float, optional): Animation duration in seconds
+        duration (float, optional): Animation duration in seconds (not used for loop)
         track_name (str, optional): Text track name
+    
+    Note: For loop animations, add intro/outro animations first, then add loop.
     """
     try:
         data = request.get_json()
@@ -1611,11 +1703,14 @@ def add_text_animation():
         duration = data.get('duration')
         track_name = data.get('track_name')
         
-        # Get animation type
+        # Get animation type based on category
+        animation_type = None
         if animation_category == 'intro':
             animation_type = getattr(cc.TextIntro, animation_type_name, None)
-        else:
+        elif animation_category == 'outro':
             animation_type = getattr(cc.TextOutro, animation_type_name, None)
+        elif animation_category == 'loop':
+            animation_type = getattr(cc.TextLoopAnim, animation_type_name, None)
         
         if not animation_type:
             return make_response(False, error=f"Animation type '{animation_type_name}' not found in {animation_category}")
@@ -1636,7 +1731,7 @@ def add_text_animation():
         
         # Add animation to the segment
         segment = text_track.segments[segment_index]
-        if duration:
+        if duration and animation_category != 'loop':
             segment.add_animation(animation_type, duration=int(duration * SEC))
         else:
             segment.add_animation(animation_type)

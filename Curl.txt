@@ -341,7 +341,7 @@ curl -X POST http://localhost:8000/add_sticker \
 # ----------------------------------------------------------------------------------------------------
 # ✍️ API: Thêm Text (`/add_text`)
 # ----------------------------------------------------------------------------------------------------
-# API này thêm text/chữ vào draft với đầy đủ style.
+# API này thêm text/chữ vào draft với đầy đủ style, border, background, shadow.
 
 # 🔌 Endpoint Info
 # | Method | URL                          |
@@ -362,8 +362,17 @@ curl -X POST http://localhost:8000/add_text \
     "transform_y": -0.7,
     "bold": false,
     "italic": false,
+    "underline": false,
     "vertical": false,
+    "align": 1,
+    "letter_spacing": 0,
+    "line_spacing": 0,
+    "auto_wrapping": true,
+    "max_line_width": 0.82,
     "alpha": 1.0,
+    "border": {"color": "#000000", "alpha": 1.0, "width": 40},
+    "background": {"color": "#000000", "alpha": 0.5, "style": 1, "round_radius": 0.1},
+    "shadow": {"color": "#000000", "alpha": 0.8, "diffuse": 15, "distance": 5, "angle": -45},
     "track_name": null
   }'
 
@@ -379,13 +388,44 @@ curl -X POST http://localhost:8000/add_text \
 # | duration | 5       | Thời lượng hiển thị (giây).    |
 
 # 🟢 FONT STYLE
-# | Tham số    | Default   | Mô tả                                   |
-# | font       | null      | Tên font. Gọi /get_font_types để xem.   |
-# | font_size  | 8.0       | Kích thước font.                        |
-# | font_color | "#FFFFFF" | Màu chữ (hex color).                    |
-# | bold       | false     | Chữ đậm.                                |
-# | italic     | false     | Chữ nghiêng.                            |
-# | alpha      | 1.0       | Độ trong suốt (0.0-1.0).                |
+# | Tham số        | Default   | Mô tả                                        |
+# | font           | null      | Tên font. Gọi /get_font_types để xem.        |
+# | font_size      | 8.0       | Kích thước font.                             |
+# | font_color     | "#FFFFFF" | Màu chữ (hex color).                         |
+# | bold           | false     | Chữ đậm.                                     |
+# | italic         | false     | Chữ nghiêng.                                 |
+# | underline      | false     | Chữ gạch chân.                               |
+# | alpha          | 1.0       | Độ trong suốt (0.0-1.0).                     |
+# | align          | 0         | Căn lề: 0=trái, 1=giữa, 2=phải.              |
+# | letter_spacing | 0         | Khoảng cách giữa các chữ.                    |
+# | line_spacing   | 0         | Khoảng cách giữa các dòng.                   |
+# | auto_wrapping  | false     | Tự động xuống dòng.                          |
+# | max_line_width | 0.82      | Chiều rộng dòng tối đa (0.0-1.0).            |
+
+# 🔵 BORDER (object, optional - viền chữ)
+# | Tham số | Default   | Mô tả                      |
+# | color   | "#000000" | Màu viền (hex).            |
+# | alpha   | 1.0       | Độ trong suốt (0.0-1.0).   |
+# | width   | 40        | Độ dày viền (0-100).       |
+
+# 🟣 BACKGROUND (object, optional - nền chữ)
+# | Tham số           | Default   | Mô tả                             |
+# | color             | "#000000" | Màu nền (hex).                    |
+# | alpha             | 1.0       | Độ trong suốt (0.0-1.0).          |
+# | style             | 1         | Kiểu nền (1 hoặc 2).              |
+# | round_radius      | 0         | Bo góc (0.0-1.0).                 |
+# | height            | 0.14      | Chiều cao (0.0-1.0).              |
+# | width             | 0.14      | Chiều rộng (0.0-1.0).             |
+# | horizontal_offset | 0.5       | Vị trí ngang (0.0-1.0).           |
+# | vertical_offset   | 0.5       | Vị trí dọc (0.0-1.0).             |
+
+# ⚫ SHADOW (object, optional - bóng chữ)
+# | Tham số  | Default   | Mô tả                       |
+# | color    | "#000000" | Màu bóng (hex).             |
+# | alpha    | 1.0       | Độ trong suốt (0.0-1.0).    |
+# | diffuse  | 15        | Độ mờ (0-100).              |
+# | distance | 5         | Khoảng cách (0-100).        |
+# | angle    | -45       | Góc bóng (-180 - 180).      |
 
 
 # ----------------------------------------------------------------------------------------------------
@@ -414,13 +454,14 @@ curl -X POST http://localhost:8000/add_subtitle \
 # ----------------------------------------------------------------------------------------------------
 # 🎭 API: Thêm Text Animation (`/add_text_animation`)
 # ----------------------------------------------------------------------------------------------------
-# API này thêm animation vào/ra cho text segment.
+# API này thêm animation vào/ra/lặp cho text segment.
+# Lưu ý: Nếu dùng loop animation, hãy thêm intro/outro trước, rồi mới thêm loop.
 
 # 🔌 Endpoint Info
 # | Method | URL                                   |
 # | POST   | http://localhost:8000/add_text_animation |
 
-# 💻 cURL Request
+# 💻 cURL Request (Intro animation)
 curl -X POST http://localhost:8000/add_text_animation \
   -H "Content-Type: application/json" \
   -d '{
@@ -432,17 +473,32 @@ curl -X POST http://localhost:8000/add_text_animation \
     "track_name": null
   }'
 
+# 💻 cURL Request (Loop animation)
+curl -X POST http://localhost:8000/add_text_animation \
+  -H "Content-Type: application/json" \
+  -d '{
+    "draft_id": "YOUR_DRAFT_ID",
+    "animation_type": "闪烁",
+    "animation_category": "loop",
+    "segment_index": 0
+  }'
+
 # 📋 Chi Tiết Tham Số
 # 🔴 BẮT BUỘC (Required)
-# | Tham số        | Kiểu   | Mô tả                                           |
-# | draft_id       | string | ID draft từ /create_draft.                      |
-# | animation_type | string | Tên animation. Gọi /get_text_intro_types.       |
+# | Tham số        | Kiểu   | Mô tả                                                                 |
+# | draft_id       | string | ID draft từ /create_draft.                                            |
+# | animation_type | string | Tên animation. Gọi endpoint tương ứng theo category.                  |
 
 # 🟡 OPTIONAL
-# | Tham số            | Default | Mô tả                                        |
-# | animation_category | "intro" | Loại animation: "intro" hoặc "outro".        |
-# | segment_index      | 0       | Index của text segment (0-based).            |
-# | duration           | default | Thời lượng animation (giây).                 |
+# | Tham số            | Default | Mô tả                                                                    |
+# | animation_category | "intro" | Loại: "intro", "outro", hoặc "loop".                                     |
+# | segment_index      | 0       | Index của text segment (0-based).                                        |
+# | duration           | default | Thời lượng (giây). Không dùng cho loop.                                  |
+
+# 📌 Lấy danh sách animations:
+# - Intro: GET /get_text_intro_types
+# - Outro: GET /get_text_outro_types
+# - Loop:  GET /get_text_loop_types
 
 
 # ====================================================================================================
@@ -612,19 +668,27 @@ curl -X POST http://localhost:8000/add_outro \
 # ----------------------------------------------------------------------------------------------------
 # 🎭 API: Thêm Mask (`/add_mask`)
 # ----------------------------------------------------------------------------------------------------
-# API này thêm mask (mặt nạ) cho video segment.
+# API này thêm mask (mặt nạ) cho video segment với đầy đủ tham số transform.
 
 # 🔌 Endpoint Info
 # | Method | URL                          |
 # | POST   | http://localhost:8000/add_mask |
 
-# 💻 cURL Request
+# 💻 cURL Request (Full Options)
 curl -X POST http://localhost:8000/add_mask \
   -H "Content-Type: application/json" \
   -d '{
     "draft_id": "YOUR_DRAFT_ID",
-    "mask_type": "Circle",
+    "mask_type": "圆形",
     "segment_index": 0,
+    "center_x": 0,
+    "center_y": 0,
+    "size": 0.5,
+    "rotation": 0,
+    "feather": 20,
+    "invert": false,
+    "rect_width": null,
+    "round_corner": null,
     "track_name": null
   }'
 
@@ -633,6 +697,18 @@ curl -X POST http://localhost:8000/add_mask \
 # | Tham số   | Kiểu   | Mô tả                                    |
 # | draft_id  | string | ID draft từ /create_draft.               |
 # | mask_type | string | Tên mask. Gọi /get_mask_types để xem.    |
+
+# 🟡 OPTIONAL
+# | Tham số       | Default | Mô tả                                             |
+# | segment_index | 0       | Index của video segment (0-based).                |
+# | center_x      | 0       | Vị trí tâm X (pixels). 0 = giữa.                  |
+# | center_y      | 0       | Vị trí tâm Y (pixels). 0 = giữa.                  |
+# | size          | 0.5     | Kích thước (0.0-1.0, tỉ lệ chiều cao material).   |
+# | rotation      | 0       | Xoay (độ).                                        |
+# | feather       | 0       | Độ mờ viền (0-100).                               |
+# | invert        | false   | Đảo ngược mask.                                   |
+# | rect_width    | null    | Chiều rộng (chỉ cho mask 矩形/rectangle).         |
+# | round_corner  | null    | Bo góc (0-100, chỉ cho mask 矩形/rectangle).      |
 
 
 # ----------------------------------------------------------------------------------------------------
