@@ -1,0 +1,1 @@
+# pyCapCut API Server Settings

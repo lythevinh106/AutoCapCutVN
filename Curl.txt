@@ -1,0 +1,1022 @@
+# ====================================================================================================
+# pyCapCut API Server - FULL API DOCUMENTATION v2.0
+# Base URL: http://localhost:8000
+# Updated: 2024-12
+# ====================================================================================================
+
+
+# ====================================================================================================
+# 🏠 API: Home / API Info (`/`)
+# ====================================================================================================
+# Endpoint trả về thông tin tổng quan về API server và danh sách các endpoint.
+
+# 🔌 Endpoint Info
+# | Method | URL                    |
+# | GET    | http://localhost:8000/ |
+
+# 💻 cURL Request
+curl -X GET http://localhost:8000/
+
+# 📋 Response mẫu
+# {
+#   "success": true,
+#   "output": {
+#     "service": "pyCapCut API Server",
+#     "version": "2.0.0",
+#     "endpoints": {...}
+#   },
+#   "error": ""
+# }
+
+
+# ====================================================================================================
+# 🩺 API: Health Check (`/health`)
+# ====================================================================================================
+# Endpoint kiểm tra trạng thái server.
+
+# 🔌 Endpoint Info
+# | Method | URL                        |
+# | GET    | http://localhost:8000/health |
+
+# 💻 cURL Request
+curl -X GET http://localhost:8000/health
+
+
+# ====================================================================================================
+# 📁 DRAFT MANAGEMENT ENDPOINTS
+# ====================================================================================================
+
+
+# ----------------------------------------------------------------------------------------------------
+# 📁 API: Tạo Draft Mới (`/create_draft`)
+# ----------------------------------------------------------------------------------------------------
+# API này tạo một draft CapCut mới và trả về draft_id để sử dụng cho các API khác.
+
+# 🔌 Endpoint Info
+# | Method | URL                             |
+# | POST   | http://localhost:8000/create_draft |
+
+# 💻 cURL Request (Full Options)
+curl -X POST http://localhost:8000/create_draft \
+  -H "Content-Type: application/json" \
+  -d '{
+    "draft_name": "my_video_project",
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "draft_folder": "C:\\Users\\VINH\\AppData\\Local\\CapCut\\User Data\\Projects\\com.lveditor.draft"
+  }'
+
+# 📋 Chi Tiết Tham Số
+# 🟡 OPTIONAL (tất cả đều có default)
+# | Tham số      | Default         | Mô tả                                          |
+# | draft_name   | auto-generated  | Tên draft (folder name).                       |
+# | width        | 1920            | Chiều rộng video (pixels).                     |
+# | height       | 1080            | Chiều cao video (pixels).                      |
+# | fps          | 30              | Frame rate.                                    |
+# | draft_folder | từ config.json  | Đường dẫn đến folder chứa drafts của CapCut.   |
+
+
+# ----------------------------------------------------------------------------------------------------
+# 💾 API: Lưu Draft (`/save_draft`)
+# ----------------------------------------------------------------------------------------------------
+# API này lưu draft hiện tại ra file để có thể mở trong CapCut.
+
+# 🔌 Endpoint Info
+# | Method | URL                            |
+# | POST   | http://localhost:8000/save_draft |
+
+# 💻 cURL Request
+curl -X POST http://localhost:8000/save_draft \
+  -H "Content-Type: application/json" \
+  -d '{
+    "draft_id": "YOUR_DRAFT_ID"
+  }'
+
+# 📋 Chi Tiết Tham Số
+# 🔴 BẮT BUỘC (Required)
+# | Tham số  | Kiểu   | Mô tả                  |
+# | draft_id | string | ID draft cần lưu.      |
+
+
+# ----------------------------------------------------------------------------------------------------
+# 🗑️ API: Xóa Draft (`/delete_draft`)
+# ----------------------------------------------------------------------------------------------------
+# API này xóa draft khỏi cache memory.
+
+# 🔌 Endpoint Info
+# | Method | URL                              |
+# | POST   | http://localhost:8000/delete_draft |
+
+# 💻 cURL Request
+curl -X POST http://localhost:8000/delete_draft \
+  -H "Content-Type: application/json" \
+  -d '{
+    "draft_id": "YOUR_DRAFT_ID"
+  }'
+
+# 📋 Chi Tiết Tham Số
+# 🔴 BẮT BUỘC (Required)
+# | Tham số  | Kiểu   | Mô tả                  |
+# | draft_id | string | ID draft cần xóa.      |
+
+
+# ----------------------------------------------------------------------------------------------------
+# ℹ️ API: Thông Tin Draft (`/get_draft_info`)
+# ----------------------------------------------------------------------------------------------------
+# API này lấy thông tin chi tiết về draft.
+
+# 🔌 Endpoint Info
+# | Method | URL                                |
+# | POST   | http://localhost:8000/get_draft_info |
+
+# 💻 cURL Request
+curl -X POST http://localhost:8000/get_draft_info \
+  -H "Content-Type: application/json" \
+  -d '{
+    "draft_id": "YOUR_DRAFT_ID"
+  }'
+
+# 📋 Response mẫu
+# {
+#   "success": true,
+#   "output": {
+#     "draft_id": "abc123",
+#     "draft_name": "my_project",
+#     "width": 1920,
+#     "height": 1080,
+#     "fps": 30,
+#     "duration": 10.5,
+#     "tracks": {
+#       "video": {"type": "video", "segments": 2},
+#       "audio": {"type": "audio", "segments": 1}
+#     }
+#   }
+# }
+
+
+# ----------------------------------------------------------------------------------------------------
+# 📋 API: Liệt kê Drafts (`/list_drafts`)
+# ----------------------------------------------------------------------------------------------------
+# API này liệt kê tất cả các draft đang được cache trong memory.
+
+# 🔌 Endpoint Info
+# | Method | URL                             |
+# | GET    | http://localhost:8000/list_drafts |
+
+# 💻 cURL Request
+curl -X GET http://localhost:8000/list_drafts
+
+
+# ====================================================================================================
+# 🎬 MEDIA ENDPOINTS
+# ====================================================================================================
+
+
+# ----------------------------------------------------------------------------------------------------
+# 🎬 API: Thêm Video (`/add_video`)
+# ----------------------------------------------------------------------------------------------------
+# API này thêm một video segment vào draft.
+
+# 🔌 Endpoint Info
+# | Method | URL                          |
+# | POST   | http://localhost:8000/add_video |
+
+# 💻 cURL Request (Full Options)
+curl -X POST http://localhost:8000/add_video \
+  -H "Content-Type: application/json" \
+  -d '{
+    "draft_id": "YOUR_DRAFT_ID",
+    "video_path": "F:\\Videos\\my_video.mp4",
+    "start": 0,
+    "duration": 10,
+    "target_start": 0,
+    "transform_x": 0,
+    "transform_y": 0,
+    "scale_x": 1,
+    "scale_y": 1,
+    "volume": 1.0,
+    "speed": 1.0,
+    "track_name": null
+  }'
+
+# 📋 Chi Tiết Tham Số
+# 🔴 BẮT BUỘC (Required)
+# | Tham số    | Kiểu   | Mô tả                                      |
+# | draft_id   | string | ID draft từ /create_draft.                 |
+# | video_path | string | Đường dẫn file video local.                |
+
+# 🟡 TIMING
+# | Tham số      | Default     | Mô tả                                    |
+# | start        | 0           | Thời điểm cắt từ source (giây).          |
+# | duration     | full video  | Thời lượng segment (giây).               |
+# | target_start | 0           | Vị trí trên timeline (giây).             |
+
+# 🟢 TRANSFORM
+# | Tham số     | Default | Mô tả                            |
+# | transform_x | 0       | Vị trí ngang (-1.0 ↔ 1.0).       |
+# | transform_y | 0       | Vị trí dọc (-1.0 ↔ 1.0).         |
+# | scale_x     | 1       | Tỷ lệ ngang.                     |
+# | scale_y     | 1       | Tỷ lệ dọc.                       |
+
+# 🔵 AUDIO/SPEED
+# | Tham số | Default | Mô tả                    |
+# | volume  | 1.0     | Âm lượng (0.0-1.0).      |
+# | speed   | 1.0     | Tốc độ phát (0.1-100).   |
+
+
+# ----------------------------------------------------------------------------------------------------
+# 🖼️ API: Thêm Image (`/add_image`)
+# ----------------------------------------------------------------------------------------------------
+# API này thêm một hình ảnh/GIF vào draft.
+
+# 🔌 Endpoint Info
+# | Method | URL                           |
+# | POST   | http://localhost:8000/add_image |
+
+# 💻 cURL Request (Full Options)
+curl -X POST http://localhost:8000/add_image \
+  -H "Content-Type: application/json" \
+  -d '{
+    "draft_id": "YOUR_DRAFT_ID",
+    "image_path": "F:\\Images\\my_image.png",
+    "start": 0,
+    "duration": 3.0,
+    "transform_x": 0,
+    "transform_y": 0,
+    "scale_x": 1,
+    "scale_y": 1,
+    "track_name": null
+  }'
+
+# 📋 Chi Tiết Tham Số
+# 🔴 BẮT BUỘC (Required)
+# | Tham số    | Kiểu   | Mô tả                          |
+# | draft_id   | string | ID draft từ /create_draft.     |
+# | image_path | string | Đường dẫn file image local.    |
+
+# 🟡 TIMING
+# | Tham số  | Default | Mô tả                              |
+# | start    | 0       | Vị trí trên timeline (giây).       |
+# | duration | 3.0     | Thời lượng hiển thị (giây).        |
+
+
+# ----------------------------------------------------------------------------------------------------
+# 🎵 API: Thêm Audio (`/add_audio`)
+# ----------------------------------------------------------------------------------------------------
+# API này thêm một audio segment vào draft.
+
+# 🔌 Endpoint Info
+# | Method | URL                           |
+# | POST   | http://localhost:8000/add_audio |
+
+# 💻 cURL Request (Full Options)
+curl -X POST http://localhost:8000/add_audio \
+  -H "Content-Type: application/json" \
+  -d '{
+    "draft_id": "YOUR_DRAFT_ID",
+    "audio_path": "F:\\Audio\\background_music.mp3",
+    "start": 0,
+    "duration": null,
+    "target_start": 0,
+    "volume": 0.8,
+    "speed": 1.0,
+    "track_name": null
+  }'
+
+# 📋 Chi Tiết Tham Số
+# 🔴 BẮT BUỘC (Required)
+# | Tham số    | Kiểu   | Mô tả                          |
+# | draft_id   | string | ID draft từ /create_draft.     |
+# | audio_path | string | Đường dẫn file audio local.    |
+
+# 🟡 TIMING
+# | Tham số      | Default    | Mô tả                              |
+# | start        | 0          | Thời điểm cắt từ source (giây).    |
+# | duration     | full audio | Thời lượng segment (giây).         |
+# | target_start | 0          | Vị trí trên timeline (giây).       |
+
+# 🟢 AUDIO
+# | Tham số | Default | Mô tả                    |
+# | volume  | 1.0     | Âm lượng (0.0-1.0).      |
+# | speed   | 1.0     | Tốc độ phát (0.1-100).   |
+
+
+# ----------------------------------------------------------------------------------------------------
+# 🎨 API: Thêm Sticker (`/add_sticker`)
+# ----------------------------------------------------------------------------------------------------
+# API này thêm một sticker vào draft.
+
+# 🔌 Endpoint Info
+# | Method | URL                             |
+# | POST   | http://localhost:8000/add_sticker |
+
+# 💻 cURL Request (Full Options)
+curl -X POST http://localhost:8000/add_sticker \
+  -H "Content-Type: application/json" \
+  -d '{
+    "draft_id": "YOUR_DRAFT_ID",
+    "resource_id": "STICKER_RESOURCE_ID",
+    "start": 0,
+    "duration": 3.0,
+    "transform_x": 0,
+    "transform_y": 0,
+    "scale_x": 1,
+    "scale_y": 1,
+    "track_name": "sticker"
+  }'
+
+# 📋 Chi Tiết Tham Số
+# 🔴 BẮT BUỘC (Required)
+# | Tham số     | Kiểu   | Mô tả                                  |
+# | draft_id    | string | ID draft từ /create_draft.             |
+# | resource_id | string | Resource ID của sticker (từ template). |
+
+
+# ====================================================================================================
+# ✍️ TEXT ENDPOINTS
+# ====================================================================================================
+
+
+# ----------------------------------------------------------------------------------------------------
+# ✍️ API: Thêm Text (`/add_text`)
+# ----------------------------------------------------------------------------------------------------
+# API này thêm text/chữ vào draft với đầy đủ style.
+
+# 🔌 Endpoint Info
+# | Method | URL                          |
+# | POST   | http://localhost:8000/add_text |
+
+# 💻 cURL Request (Full Options)
+curl -X POST http://localhost:8000/add_text \
+  -H "Content-Type: application/json" \
+  -d '{
+    "draft_id": "YOUR_DRAFT_ID",
+    "text": "Hello World! 🎉",
+    "start": 0,
+    "duration": 5,
+    "font": null,
+    "font_size": 8.0,
+    "font_color": "#FFFF00",
+    "transform_x": 0,
+    "transform_y": -0.7,
+    "bold": false,
+    "italic": false,
+    "vertical": false,
+    "alpha": 1.0,
+    "track_name": null
+  }'
+
+# 📋 Chi Tiết Tham Số
+# 🔴 BẮT BUỘC (Required)
+# | Tham số  | Kiểu   | Mô tả                        |
+# | draft_id | string | ID draft từ /create_draft.   |
+# | text     | string | Nội dung text cần hiển thị.  |
+
+# 🟡 TIMING
+# | Tham số  | Default | Mô tả                          |
+# | start    | 0       | Thời điểm bắt đầu (giây).      |
+# | duration | 5       | Thời lượng hiển thị (giây).    |
+
+# 🟢 FONT STYLE
+# | Tham số    | Default   | Mô tả                                   |
+# | font       | null      | Tên font. Gọi /get_font_types để xem.   |
+# | font_size  | 8.0       | Kích thước font.                        |
+# | font_color | "#FFFFFF" | Màu chữ (hex color).                    |
+# | bold       | false     | Chữ đậm.                                |
+# | italic     | false     | Chữ nghiêng.                            |
+# | alpha      | 1.0       | Độ trong suốt (0.0-1.0).                |
+
+
+# ----------------------------------------------------------------------------------------------------
+# 📝 API: Thêm Subtitle từ SRT (`/add_subtitle`)
+# ----------------------------------------------------------------------------------------------------
+# API này import phụ đề từ file SRT vào draft.
+
+# 🔌 Endpoint Info
+# | Method | URL                              |
+# | POST   | http://localhost:8000/add_subtitle |
+
+# 💻 cURL Request (Full Options)
+curl -X POST http://localhost:8000/add_subtitle \
+  -H "Content-Type: application/json" \
+  -d '{
+    "draft_id": "YOUR_DRAFT_ID",
+    "srt_path": "F:\\Subtitles\\my_subtitles.srt",
+    "font_size": 5.0,
+    "font_color": "#FFFFFF",
+    "transform_y": -0.8,
+    "time_offset": 0,
+    "track_name": "subtitle"
+  }'
+
+
+# ----------------------------------------------------------------------------------------------------
+# 🎭 API: Thêm Text Animation (`/add_text_animation`)
+# ----------------------------------------------------------------------------------------------------
+# API này thêm animation vào/ra cho text segment.
+
+# 🔌 Endpoint Info
+# | Method | URL                                   |
+# | POST   | http://localhost:8000/add_text_animation |
+
+# 💻 cURL Request
+curl -X POST http://localhost:8000/add_text_animation \
+  -H "Content-Type: application/json" \
+  -d '{
+    "draft_id": "YOUR_DRAFT_ID",
+    "animation_type": "放大",
+    "animation_category": "intro",
+    "segment_index": 0,
+    "duration": 0.5,
+    "track_name": null
+  }'
+
+# 📋 Chi Tiết Tham Số
+# 🔴 BẮT BUỘC (Required)
+# | Tham số        | Kiểu   | Mô tả                                           |
+# | draft_id       | string | ID draft từ /create_draft.                      |
+# | animation_type | string | Tên animation. Gọi /get_text_intro_types.       |
+
+# 🟡 OPTIONAL
+# | Tham số            | Default | Mô tả                                        |
+# | animation_category | "intro" | Loại animation: "intro" hoặc "outro".        |
+# | segment_index      | 0       | Index của text segment (0-based).            |
+# | duration           | default | Thời lượng animation (giây).                 |
+
+
+# ====================================================================================================
+# ✨ EFFECTS ENDPOINTS
+# ====================================================================================================
+
+
+# ----------------------------------------------------------------------------------------------------
+# ✨ API: Thêm Effect (`/add_effect`)
+# ----------------------------------------------------------------------------------------------------
+# API này thêm hiệu ứng video vào draft.
+
+# 🔌 Endpoint Info
+# | Method | URL                            |
+# | POST   | http://localhost:8000/add_effect |
+
+# 💻 cURL Request (Full Options)
+curl -X POST http://localhost:8000/add_effect \
+  -H "Content-Type: application/json" \
+  -d '{
+    "draft_id": "YOUR_DRAFT_ID",
+    "effect_type": "Gold_Sparkles",
+    "effect_category": "scene",
+    "start": 0,
+    "duration": 3.0,
+    "params": null,
+    "track_name": "effect_01"
+  }'
+
+# 📋 Chi Tiết Tham Số
+# 🔴 BẮT BUỘC (Required)
+# | Tham số     | Kiểu   | Mô tả                                                    |
+# | draft_id    | string | ID draft từ /create_draft.                               |
+# | effect_type | string | Tên effect. Gọi /get_video_scene_effect_types để xem.    |
+
+# 🟡 OPTIONAL
+# | Tham số         | Default     | Mô tả                                     |
+# | effect_category | "scene"     | Loại effect: "scene" hoặc "character".    |
+# | start           | 0           | Thời điểm bắt đầu (giây).                 |
+# | duration        | 3.0         | Thời lượng effect (giây).                 |
+# | params          | null        | Danh sách tham số effect (0-100).         |
+
+
+# ----------------------------------------------------------------------------------------------------
+# 🎨 API: Thêm Filter (`/add_filter`)
+# ----------------------------------------------------------------------------------------------------
+# API này thêm bộ lọc màu (filter) vào draft.
+
+# 🔌 Endpoint Info
+# | Method | URL                            |
+# | POST   | http://localhost:8000/add_filter |
+
+# 💻 cURL Request
+curl -X POST http://localhost:8000/add_filter \
+  -H "Content-Type: application/json" \
+  -d '{
+    "draft_id": "YOUR_DRAFT_ID",
+    "filter_type": "BW_2",
+    "start": 0,
+    "duration": 5.0,
+    "intensity": 80,
+    "track_name": "filter_01"
+  }'
+
+# 📋 Chi Tiết Tham Số
+# 🔴 BẮT BUỘC (Required)
+# | Tham số     | Kiểu   | Mô tả                                       |
+# | draft_id    | string | ID draft từ /create_draft.                  |
+# | filter_type | string | Tên filter. Gọi /get_filter_types để xem.   |
+
+# 🟡 OPTIONAL
+# | Tham số    | Default     | Mô tả                              |
+# | start      | 0           | Thời điểm bắt đầu (giây).          |
+# | duration   | 3.0         | Thời lượng filter (giây).          |
+# | intensity  | 100         | Cường độ filter (0-100).           |
+# | track_name | "filter_01" | Tên track filter.                  |
+
+
+# ----------------------------------------------------------------------------------------------------
+# 🔀 API: Thêm Transition (`/add_transition`)
+# ----------------------------------------------------------------------------------------------------
+# API này thêm chuyển cảnh (transition) vào cuối một video segment.
+
+# 🔌 Endpoint Info
+# | Method | URL                                |
+# | POST   | http://localhost:8000/add_transition |
+
+# 💻 cURL Request
+curl -X POST http://localhost:8000/add_transition \
+  -H "Content-Type: application/json" \
+  -d '{
+    "draft_id": "YOUR_DRAFT_ID",
+    "transition_type": "White_Flash",
+    "segment_index": 0,
+    "duration": 0.5,
+    "track_name": null
+  }'
+
+# 📋 Chi Tiết Tham Số
+# 🔴 BẮT BUỘC (Required)
+# | Tham số         | Kiểu   | Mô tả                                             |
+# | draft_id        | string | ID draft từ /create_draft.                        |
+# | transition_type | string | Tên transition. Gọi /get_transition_types.        |
+
+# 🟡 OPTIONAL
+# | Tham số       | Default | Mô tả                                            |
+# | segment_index | 0       | Index của video segment (0-based).               |
+# | duration      | default | Thời lượng transition (giây).                    |
+
+# ⚠️ LƯU Ý: Transition được thêm vào CUỐI segment để chuyển sang segment TIẾP THEO.
+
+
+# ----------------------------------------------------------------------------------------------------
+# ▶️ API: Thêm Intro Animation (`/add_intro`)
+# ----------------------------------------------------------------------------------------------------
+# API này thêm animation xuất hiện (intro) cho video segment.
+
+# 🔌 Endpoint Info
+# | Method | URL                           |
+# | POST   | http://localhost:8000/add_intro |
+
+# 💻 cURL Request
+curl -X POST http://localhost:8000/add_intro \
+  -H "Content-Type: application/json" \
+  -d '{
+    "draft_id": "YOUR_DRAFT_ID",
+    "intro_type": "渐显",
+    "segment_index": 0,
+    "duration": 0.5,
+    "track_name": null
+  }'
+
+# 📋 Chi Tiết Tham Số
+# 🔴 BẮT BUỘC (Required)
+# | Tham số    | Kiểu   | Mô tả                                                 |
+# | draft_id   | string | ID draft từ /create_draft.                            |
+# | intro_type | string | Tên intro animation. Gọi /get_intro_animation_types.  |
+
+
+# ----------------------------------------------------------------------------------------------------
+# ◀️ API: Thêm Outro Animation (`/add_outro`)
+# ----------------------------------------------------------------------------------------------------
+# API này thêm animation biến mất (outro) cho video segment.
+
+# 🔌 Endpoint Info
+# | Method | URL                           |
+# | POST   | http://localhost:8000/add_outro |
+
+# 💻 cURL Request
+curl -X POST http://localhost:8000/add_outro \
+  -H "Content-Type: application/json" \
+  -d '{
+    "draft_id": "YOUR_DRAFT_ID",
+    "outro_type": "渐隐",
+    "segment_index": 0,
+    "duration": 0.5,
+    "track_name": null
+  }'
+
+# 📋 Chi Tiết Tham Số
+# 🔴 BẮT BUỘC (Required)
+# | Tham số    | Kiểu   | Mô tả                                                 |
+# | draft_id   | string | ID draft từ /create_draft.                            |
+# | outro_type | string | Tên outro animation. Gọi /get_outro_animation_types.  |
+
+
+# ----------------------------------------------------------------------------------------------------
+# 🎭 API: Thêm Mask (`/add_mask`)
+# ----------------------------------------------------------------------------------------------------
+# API này thêm mask (mặt nạ) cho video segment.
+
+# 🔌 Endpoint Info
+# | Method | URL                          |
+# | POST   | http://localhost:8000/add_mask |
+
+# 💻 cURL Request
+curl -X POST http://localhost:8000/add_mask \
+  -H "Content-Type: application/json" \
+  -d '{
+    "draft_id": "YOUR_DRAFT_ID",
+    "mask_type": "Circle",
+    "segment_index": 0,
+    "track_name": null
+  }'
+
+# 📋 Chi Tiết Tham Số
+# 🔴 BẮT BUỘC (Required)
+# | Tham số   | Kiểu   | Mô tả                                    |
+# | draft_id  | string | ID draft từ /create_draft.               |
+# | mask_type | string | Tên mask. Gọi /get_mask_types để xem.    |
+
+
+# ----------------------------------------------------------------------------------------------------
+# 🔊 API: Thêm Audio Effect (`/add_audio_effect`)
+# ----------------------------------------------------------------------------------------------------
+# API này thêm hiệu ứng âm thanh cho audio segment.
+
+# 🔌 Endpoint Info
+# | Method | URL                                  |
+# | POST   | http://localhost:8000/add_audio_effect |
+
+# 💻 cURL Request
+curl -X POST http://localhost:8000/add_audio_effect \
+  -H "Content-Type: application/json" \
+  -d '{
+    "draft_id": "YOUR_DRAFT_ID",
+    "effect_type": "Echo",
+    "segment_index": 0,
+    "params": null,
+    "track_name": null
+  }'
+
+# 📋 Chi Tiết Tham Số
+# 🔴 BẮT BUỘC (Required)
+# | Tham số     | Kiểu   | Mô tả                                          |
+# | draft_id    | string | ID draft từ /create_draft.                     |
+# | effect_type | string | Tên effect. Gọi /get_audio_effect_types.       |
+
+
+# ----------------------------------------------------------------------------------------------------
+# 🔈 API: Thêm Audio Fade (`/add_audio_fade`)
+# ----------------------------------------------------------------------------------------------------
+# API này thêm hiệu ứng fade in/out cho audio segment.
+
+# 🔌 Endpoint Info
+# | Method | URL                                |
+# | POST   | http://localhost:8000/add_audio_fade |
+
+# 💻 cURL Request
+curl -X POST http://localhost:8000/add_audio_fade \
+  -H "Content-Type: application/json" \
+  -d '{
+    "draft_id": "YOUR_DRAFT_ID",
+    "fade_in": 1.0,
+    "fade_out": 2.0,
+    "segment_index": 0,
+    "track_name": null
+  }'
+
+# 📋 Chi Tiết Tham Số
+# 🔴 BẮT BUỘC (Required)
+# | Tham số  | Kiểu   | Mô tả                      |
+# | draft_id | string | ID draft từ /create_draft. |
+
+# 🟡 OPTIONAL (ít nhất 1 trong fade_in/fade_out > 0)
+# | Tham số       | Default | Mô tả                              |
+# | fade_in       | 0       | Thời lượng fade in (giây).         |
+# | fade_out      | 0       | Thời lượng fade out (giây).        |
+# | segment_index | 0       | Index của audio segment (0-based). |
+
+
+# ----------------------------------------------------------------------------------------------------
+# � API: Thêm Video Fade (`/add_video_fade`)
+# ----------------------------------------------------------------------------------------------------
+# API này thêm hiệu ứng fade in/out cho audio của video segment.
+
+# 🔌 Endpoint Info
+# | Method | URL                                |
+# | POST   | http://localhost:8000/add_video_fade |
+
+# 💻 cURL Request
+curl -X POST http://localhost:8000/add_video_fade \
+  -H "Content-Type: application/json" \
+  -d '{
+    "draft_id": "YOUR_DRAFT_ID",
+    "fade_in": 1.0,
+    "fade_out": 2.0,
+    "segment_index": 0,
+    "track_name": null
+  }'
+
+# 📋 Chi Tiết Tham Số
+# 🔴 BẮT BUỘC (Required)
+# | Tham số  | Kiểu   | Mô tả                      |
+# | draft_id | string | ID draft từ /create_draft. |
+
+
+# ----------------------------------------------------------------------------------------------------
+# 🖼️ API: Thêm Background Filling (`/add_background_filling`)
+# ----------------------------------------------------------------------------------------------------
+# API này thêm nền (blur hoặc màu) cho video segment khi video không phủ kín canvas.
+
+# 🔌 Endpoint Info
+# | Method | URL                                       |
+# | POST   | http://localhost:8000/add_background_filling |
+
+# 💻 cURL Request (Blur background)
+curl -X POST http://localhost:8000/add_background_filling \
+  -H "Content-Type: application/json" \
+  -d '{
+    "draft_id": "YOUR_DRAFT_ID",
+    "fill_type": "blur",
+    "blur": 0.375,
+    "segment_index": 0
+  }'
+
+# 💻 cURL Request (Color background)
+curl -X POST http://localhost:8000/add_background_filling \
+  -H "Content-Type: application/json" \
+  -d '{
+    "draft_id": "YOUR_DRAFT_ID",
+    "fill_type": "color",
+    "color": "#000000FF",
+    "segment_index": 0
+  }'
+
+# 📋 Chi Tiết Tham Số
+# 🔴 BẮT BUỘC (Required)
+# | Tham số   | Kiểu   | Mô tả                             |
+# | draft_id  | string | ID draft từ /create_draft.        |
+# | fill_type | string | 'blur' hoặc 'color'.              |
+
+# 🟡 OPTIONAL
+# | Tham số       | Default      | Mô tả                                                  |
+# | blur          | 0.0625       | Độ blur (0.0-1.0). CapCut: 0.0625, 0.375, 0.75, 1.0    |
+# | color         | '#00000000'  | Màu nền format '#RRGGBBAA'.                            |
+# | segment_index | 0            | Index của video segment (0-based).                     |
+
+
+# ----------------------------------------------------------------------------------------------------
+# 🎬 API: Thêm Video Effect trực tiếp vào Segment (`/add_video_effect`)
+# ----------------------------------------------------------------------------------------------------
+# API này thêm effect trực tiếp vào video segment (thay vì dùng effect track).
+
+# 🔌 Endpoint Info
+# | Method | URL                                  |
+# | POST   | http://localhost:8000/add_video_effect |
+
+# 💻 cURL Request
+curl -X POST http://localhost:8000/add_video_effect \
+  -H "Content-Type: application/json" \
+  -d '{
+    "draft_id": "YOUR_DRAFT_ID",
+    "effect_type": "Beat_Shots",
+    "effect_category": "scene",
+    "segment_index": 0,
+    "params": null
+  }'
+
+# 📋 Chi Tiết Tham Số
+# 🔴 BẮT BUỘC (Required)
+# | Tham số     | Kiểu   | Mô tả                                             |
+# | draft_id    | string | ID draft từ /create_draft.                        |
+# | effect_type | string | Tên effect. Gọi /get_video_scene_effect_types.    |
+
+# 🟡 OPTIONAL
+# | Tham số         | Default | Mô tả                                          |
+# | effect_category | 'scene' | 'scene' hoặc 'character'.                      |
+# | segment_index   | 0       | Index của video segment (0-based).             |
+# | params          | null    | Tham số effect (0-100).                        |
+
+
+# ----------------------------------------------------------------------------------------------------
+# �🎤 API: Thêm Tone Effect - Voice Changer (`/add_tone_effect`)
+# ----------------------------------------------------------------------------------------------------
+# API này thêm hiệu ứng thay đổi giọng nói (voice changer) cho audio segment.
+# Ví dụ: 大叔 (Uncle), 女生 (Girl), 机器人 (Robot), 萝莉 (Loli), 花栗鼠 (Chipmunk)
+
+# 🔌 Endpoint Info
+# | Method | URL                                 |
+# | POST   | http://localhost:8000/add_tone_effect |
+
+# 💻 cURL Request
+curl -X POST http://localhost:8000/add_tone_effect \
+  -H "Content-Type: application/json" \
+  -d '{
+    "draft_id": "YOUR_DRAFT_ID",
+    "effect_type": "机器人",
+    "segment_index": 0,
+    "params": null,
+    "track_name": null
+  }'
+
+# 📋 Chi Tiết Tham Số
+# 🔴 BẮT BUỘC (Required)
+# | Tham số     | Kiểu   | Mô tả                                             |
+# | draft_id    | string | ID draft từ /create_draft.                        |
+# | effect_type | string | Tên tone effect. Gọi /get_tone_effect_types.      |
+
+# 🟡 OPTIONAL
+# | Tham số       | Default | Mô tả                              |
+# | segment_index | 0       | Index của audio segment (0-based). |
+# | params        | null    | Tham số effect (0-100).            |
+
+
+# ----------------------------------------------------------------------------------------------------
+# 🎵 API: Thêm Speech To Song Effect (`/add_speech_to_song`)
+# ----------------------------------------------------------------------------------------------------
+# API này thêm hiệu ứng chuyển lời nói thành bài hát cho audio segment.
+# Ví dụ: Lofi, 民谣 (Folk), 嘻哈 (Hip-hop), 爵士 (Jazz), 节奏蓝调 (R&B)
+
+# 🔌 Endpoint Info
+# | Method | URL                                     |
+# | POST   | http://localhost:8000/add_speech_to_song |
+
+# 💻 cURL Request
+curl -X POST http://localhost:8000/add_speech_to_song \
+  -H "Content-Type: application/json" \
+  -d '{
+    "draft_id": "YOUR_DRAFT_ID",
+    "effect_type": "Lofi",
+    "segment_index": 0,
+    "params": null,
+    "track_name": null
+  }'
+
+# 📋 Chi Tiết Tham Số
+# 🔴 BẮT BUỘC (Required)
+# | Tham số     | Kiểu   | Mô tả                                                 |
+# | draft_id    | string | ID draft từ /create_draft.                            |
+# | effect_type | string | Tên speech-to-song. Gọi /get_speech_to_song_types.    |
+
+
+# ====================================================================================================
+# 📚 METADATA QUERY ENDPOINTS - Lấy danh sách các loại hiệu ứng, font, animation
+# ====================================================================================================
+
+# 🔤 Lấy danh sách Font
+curl -X GET http://localhost:8000/get_font_types
+
+# 🎨 Lấy danh sách Filter
+curl -X GET http://localhost:8000/get_filter_types
+
+# 🎭 Lấy danh sách Mask
+curl -X GET http://localhost:8000/get_mask_types
+
+# 🎬 Lấy danh sách Transition (chuyển cảnh)
+curl -X GET http://localhost:8000/get_transition_types
+
+# ▶️ Lấy danh sách Intro Animation (animation vào)
+curl -X GET http://localhost:8000/get_intro_animation_types
+
+# ◀️ Lấy danh sách Outro Animation (animation ra)
+curl -X GET http://localhost:8000/get_outro_animation_types
+
+# 🔄 Lấy danh sách Combo Animation
+curl -X GET http://localhost:8000/get_combo_animation_types
+
+# 📝 Lấy danh sách Text Intro Animation
+curl -X GET http://localhost:8000/get_text_intro_types
+
+# 📝 Lấy danh sách Text Outro Animation
+curl -X GET http://localhost:8000/get_text_outro_types
+
+# 🔁 Lấy danh sách Text Loop Animation
+curl -X GET http://localhost:8000/get_text_loop_types
+
+# 🎬 Lấy danh sách Video Scene Effects
+curl -X GET http://localhost:8000/get_video_scene_effect_types
+
+# 👤 Lấy danh sách Video Character Effects
+curl -X GET http://localhost:8000/get_video_character_effect_types
+
+# 🔊 Lấy danh sách Audio Effects
+curl -X GET http://localhost:8000/get_audio_effect_types
+
+# 🎤 Lấy danh sách Tone Effects (Voice Changer - thay đổi giọng nói)
+# Response bao gồm: name, is_vip (true/false)
+# Ví dụ: 大叔 (Uncle), 女生 (Girl), 机器人 (Robot), 萝莉 (Loli), etc.
+curl -X GET http://localhost:8000/get_tone_effect_types
+
+# 🎵 Lấy danh sách Speech To Song Types (Chuyển lời nói thành bài hát)
+# Response bao gồm: name, is_vip (true/false)
+# Ví dụ: Lofi, 民谣 (Folk), 嘻哈 (Hip-hop), 爵士 (Jazz), etc.
+curl -X GET http://localhost:8000/get_speech_to_song_types
+
+
+# ====================================================================================================
+# 🚀 WORKFLOW MẪU - Tạo video hoàn chỉnh với đầy đủ hiệu ứng
+# ====================================================================================================
+
+# Bước 1: Tạo draft mới
+curl -X POST http://localhost:8000/create_draft \
+  -H "Content-Type: application/json" \
+  -d '{"draft_name": "my_project", "width": 1920, "height": 1080}'
+# → Lấy draft_id từ response
+
+# Bước 2: Thêm video chính
+curl -X POST http://localhost:8000/add_video \
+  -H "Content-Type: application/json" \
+  -d '{"draft_id": "YOUR_DRAFT_ID", "video_path": "F:\\Videos\\main.mp4"}'
+
+# Bước 3: Thêm intro animation cho video
+curl -X POST http://localhost:8000/add_intro \
+  -H "Content-Type: application/json" \
+  -d '{"draft_id": "YOUR_DRAFT_ID", "intro_type": "渐显", "duration": 0.5}'
+
+# Bước 4: Thêm outro animation cho video
+curl -X POST http://localhost:8000/add_outro \
+  -H "Content-Type: application/json" \
+  -d '{"draft_id": "YOUR_DRAFT_ID", "outro_type": "渐隐", "duration": 0.5}'
+
+# Bước 5: Thêm filter
+curl -X POST http://localhost:8000/add_filter \
+  -H "Content-Type: application/json" \
+  -d '{"draft_id": "YOUR_DRAFT_ID", "filter_type": "BW_2", "start": 0, "duration": 10, "intensity": 50}'
+
+# Bước 6: Thêm effect
+curl -X POST http://localhost:8000/add_effect \
+  -H "Content-Type: application/json" \
+  -d '{"draft_id": "YOUR_DRAFT_ID", "effect_type": "Shake", "start": 2, "duration": 3}'
+
+# Bước 7: Thêm nhạc nền
+curl -X POST http://localhost:8000/add_audio \
+  -H "Content-Type: application/json" \
+  -d '{"draft_id": "YOUR_DRAFT_ID", "audio_path": "F:\\Audio\\bgm.mp3", "volume": 0.5}'
+
+# Bước 8: Thêm audio fade
+curl -X POST http://localhost:8000/add_audio_fade \
+  -H "Content-Type: application/json" \
+  -d '{"draft_id": "YOUR_DRAFT_ID", "fade_in": 1.0, "fade_out": 2.0}'
+
+# Bước 9: Thêm text tiêu đề
+curl -X POST http://localhost:8000/add_text \
+  -H "Content-Type: application/json" \
+  -d '{"draft_id": "YOUR_DRAFT_ID", "text": "My Video Title", "start": 0, "duration": 3, "font_size": 12, "font_color": "#FFFF00"}'
+
+# Bước 10: Thêm text animation
+curl -X POST http://localhost:8000/add_text_animation \
+  -H "Content-Type: application/json" \
+  -d '{"draft_id": "YOUR_DRAFT_ID", "animation_type": "放大", "animation_category": "intro"}'
+
+# Bước 11: Thêm transition (nếu có nhiều video)
+# (Thêm video thứ 2 trước, sau đó thêm transition vào video thứ 1)
+
+# Bước 12: Lấy thông tin draft
+curl -X POST http://localhost:8000/get_draft_info \
+  -H "Content-Type: application/json" \
+  -d '{"draft_id": "YOUR_DRAFT_ID"}'
+
+# Bước 13: Lưu draft
+curl -X POST http://localhost:8000/save_draft \
+  -H "Content-Type: application/json" \
+  -d '{"draft_id": "YOUR_DRAFT_ID"}'
+
+# Bước 14: Mở CapCut và tìm draft "my_project" trong Projects
+
+
+# ====================================================================================================
+# 💡 WINDOWS POWERSHELL EXAMPLES
+# ====================================================================================================
+
+# 📁 Tạo Draft mới (PowerShell)
+Invoke-RestMethod -Uri "http://localhost:8000/create_draft" -Method POST -ContentType "application/json" -Body '{"draft_name": "ps_demo", "width": 1920, "height": 1080}'
+
+# 🎬 Thêm Video (PowerShell)
+Invoke-RestMethod -Uri "http://localhost:8000/add_video" -Method POST -ContentType "application/json" -Body '{"draft_id": "YOUR_DRAFT_ID", "video_path": "F:\\Videos\\test.mp4"}'
+
+# ✍️ Thêm Text (PowerShell)
+Invoke-RestMethod -Uri "http://localhost:8000/add_text" -Method POST -ContentType "application/json" -Body '{"draft_id": "YOUR_DRAFT_ID", "text": "Hello from PowerShell!", "font_color": "#00FF00"}'
+
+# 🎨 Thêm Filter (PowerShell)
+Invoke-RestMethod -Uri "http://localhost:8000/add_filter" -Method POST -ContentType "application/json" -Body '{"draft_id": "YOUR_DRAFT_ID", "filter_type": "BW_2", "intensity": 80}'
+
+# ▶️ Thêm Intro Animation (PowerShell)
+Invoke-RestMethod -Uri "http://localhost:8000/add_intro" -Method POST -ContentType "application/json" -Body '{"draft_id": "YOUR_DRAFT_ID", "intro_type": "渐显"}'
+
+# ◀️ Thêm Outro Animation (PowerShell)
+Invoke-RestMethod -Uri "http://localhost:8000/add_outro" -Method POST -ContentType "application/json" -Body '{"draft_id": "YOUR_DRAFT_ID", "outro_type": "渐隐"}'
+
+# 🔀 Thêm Transition (PowerShell)
+Invoke-RestMethod -Uri "http://localhost:8000/add_transition" -Method POST -ContentType "application/json" -Body '{"draft_id": "YOUR_DRAFT_ID", "transition_type": "White_Flash"}'
+
+# 💾 Lưu Draft (PowerShell)
+Invoke-RestMethod -Uri "http://localhost:8000/save_draft" -Method POST -ContentType "application/json" -Body '{"draft_id": "YOUR_DRAFT_ID"}'
+
+# 🔤 Lấy danh sách Font (PowerShell)
+Invoke-RestMethod -Uri "http://localhost:8000/get_font_types" -Method GET
+
+# 🎨 Lấy danh sách Filter (PowerShell)
+Invoke-RestMethod -Uri "http://localhost:8000/get_filter_types" -Method GET
+
+# 🔀 Lấy danh sách Transition (PowerShell)
+Invoke-RestMethod -Uri "http://localhost:8000/get_transition_types" -Method GET
+
+# ℹ️ Lấy thông tin Draft (PowerShell)
+Invoke-RestMethod -Uri "http://localhost:8000/get_draft_info" -Method POST -ContentType "application/json" -Body '{"draft_id": "YOUR_DRAFT_ID"}'

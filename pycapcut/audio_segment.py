@@ -16,6 +16,8 @@ from .keyframe import KeyframeProperty, KeyframeList
 
 from .metadata import EffectParamInstance
 from .metadata import AudioSceneEffectType
+from .metadata.tone_effect import ToneEffectType
+from .metadata.speech_to_song import SpeechToSongType
 
 class AudioEffect:
     """音频特效对象"""
@@ -46,14 +48,14 @@ class AudioEffect:
             self.category_id = "sound_effect"
             self.category_name = "场景音"
             self.category_index = 1
-        # elif isinstance(effect_meta, ToneEffectType):
-        #     self.category_id = "tone"
-        #     self.category_name = "音色"
-        #     self.category_index = 2
-        # elif isinstance(effect_meta, SpeechToSongType):
-        #     self.category_id = "speech_to_song"
-        #     self.category_name = "声音成曲"
-        #     self.category_index = 3
+        elif isinstance(effect_meta, ToneEffectType):
+            self.category_id = "tone"
+            self.category_name = "音色"
+            self.category_index = 2
+        elif isinstance(effect_meta, SpeechToSongType):
+            self.category_id = "speech_to_song"
+            self.category_name = "声音成曲"
+            self.category_index = 3
         else:
             raise TypeError("不支持的元数据类型 %s" % type(effect_meta))
 

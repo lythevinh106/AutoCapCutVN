@@ -1,0 +1,66 @@
+# pyCapCut Project Intelligence
+
+## Project Overview
+pyCapCut is a Python library for programmatically generating CapCut video editing drafts. It enables automated video editing pipelines.
+
+## Key Patterns
+
+### API Usage
+```python
+import pycapcut as cc
+from pycapcut import trange, SEC
+
+# Create draft
+draft_folder = cc.DraftFolder("<CapCut Drafts Path>")
+script = draft_folder.create_draft("my_draft", 1920, 1080)
+
+# Add tracks and segments
+script.add_track(cc.TrackType.video)
+script.add_segment(cc.VideoSegment(video_path, trange("0s", "5s")))
+script.save()
+```
+
+### Time Handling
+- Internal: microseconds (int)
+- String format: "1.5s", "1m30s", "1h2m3s"
+- Use `tim()` for conversion, `trange(start, duration)` for ranges
+
+### Segment Types
+- `VideoSegment` - video clips
+- `AudioSegment` - audio clips  
+- `TextSegment` - text/subtitles
+- `StickerSegment` - stickers
+
+### Effect/Animation Enums
+- Located in `pycapcut/metadata/`
+- Named after Chinese CapCut names
+- Use `from_name()` for lookup
+
+## Code Conventions
+
+### File Organization
+- Main classes in root `pycapcut/`
+- Metadata (enums) in `pycapcut/metadata/`
+- Assets (JSON) in `pycapcut/assets/`
+
+### Naming
+- Python snake_case for functions/variables
+- PascalCase for classes
+- Chinese names preserved in some enums (效果, 滤镜, etc.)
+
+## Common Tasks
+
+### Adding New Features
+1. Check if similar feature exists in metadata enums
+2. Study `script_file.py` for integration patterns
+3. Follow existing segment/material patterns
+
+### Debugging Drafts
+1. Check generated `draft_content.json`
+2. Verify material paths are correct
+3. Open in CapCut to see actual rendering
+
+## Known Gotchas
+- Template mode: imported tracks are read-only (mostly)
+- Some effects only work in specific CapCut versions
+- Batch export requires Windows + uiautomation
