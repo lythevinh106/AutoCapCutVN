@@ -43,6 +43,215 @@ curl -X GET http://localhost:8000/health
 
 
 # ====================================================================================================
+# 🎬 COMPOSITE PROJECT API (Single-Request Video Creation)
+# ====================================================================================================
+# API này cho phép tạo một project video hoàn chỉnh từ một JSON request duy nhất.
+# Bao gồm: video_sequence (BẮT BUỘC), audios, effects, filters, images, texts (TÙY CHỌN)
+
+# 🔌 Endpoint Info
+# | Method | URL                                    |
+# | POST   | http://localhost:8000/create_project_video |
+
+# 💻 cURL Request (Minimal - chỉ có các trường bắt buộc)
+curl -X POST http://localhost:8000/create_project_video \
+  -H "Content-Type: application/json" \
+  -d '{
+    "canvas_config": {
+      "width": 1080,
+      "height": 1920
+    },
+    "video_sequence": [
+      {
+        "source": "F:/Videos/intro.mp4"
+      }
+    ]
+  }'
+
+# 💻 cURL Request (Full Options - tất cả các trường)
+curl -X POST http://localhost:8000/create_project_video \
+  -H "Content-Type: application/json" \
+  -d '{
+    "canvas_config": {
+      "width": 1080,
+      "height": 1920,
+      "fps": 30,
+      "duration_ms": 60000
+    },
+    "video_sequence": [
+      {
+        "timeline_priority": 2,
+        "source": "F:/Videos/intro.mp4",
+        "start_trim_ms": 0,
+        "duration_ms": 5000,
+        "volume": 1.0,
+        "speed": 1.0,
+        "transform": { "x": 0, "y": 0, "scale_x": 1.0, "scale_y": 1.0, "rotation": 0, "alpha": 1.0 },
+        "intro_animation": { "type": "渐显", "duration_ms": 500 },
+        "outro_animation": { "type": "渐隐", "duration_ms": 500 },
+        "transition_to_next": { "type": "White_Flash", "duration_ms": 500 },
+        "background_fill": { "type": "blur", "intensity": 0.375 },
+        "mask": { "type": "圆形", "size": 0.5, "feather": 0, "invert": false }
+      }
+    ],
+    "audios": [
+      {
+        "source": "F:/Audio/background_music.mp3",
+        "start_ms": 0,
+        "duration_ms": null,
+        "volume": 0.4,
+        "fade_in_ms": 2000,
+        "fade_out_ms": 3000
+      }
+    ],
+    "effects": [
+      {
+        "type": "Gold_Sparkles",
+        "category": "scene",
+        "start_ms": 0,
+        "duration_ms": 5000
+      }
+    ],
+    "filters": [
+      {
+        "type": "BW_2",
+        "start_ms": 0,
+        "duration_ms": 15000,
+        "intensity": 30
+      }
+    ],
+    "images": [
+      {
+        "source": "F:/Images/logo.png",
+        "start_ms": 0,
+        "duration_ms": 5000,
+        "position": { "x": 0.7, "y": -0.8 },
+        "scale": 0.15
+      }
+    ],
+    "texts": [
+      {
+        "content": "WELCOME! 🎉",
+        "start_ms": 500,
+        "duration_ms": 4000,
+        "position": { "x": 0, "y": -0.3 },
+        "style": { "font": "Source_Han_Serif", "size": 12, "color": "#FFFFFF", "bold": true },
+        "border": { "color": "#FF0000", "width": 50 },
+        "shadow": { "color": "#000000", "alpha": 0.9, "distance": 8 },
+        "animation": { 
+          "intro": { "type": "放大", "duration_ms": 500 }, 
+          "loop": { "type": "闪烁" }, 
+          "outro": { "type": "渐隐", "duration_ms": 300 } 
+        }
+      }
+    ]
+  }'
+
+# 📋 CHI TIẾT THAM SỐ
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# canvas_config (BẮT BUỘC)
+# ═══════════════════════════════════════════════════════════════════════════════
+# | Tham số     | Kiểu | Bắt buộc? | Default | Mô tả                           |
+# | width       | int  | ✅ CÓ     | -       | Chiều rộng video (pixels)       |
+# | height      | int  | ✅ CÓ     | -       | Chiều cao video (pixels)        |
+# | fps         | int  | ❌ KHÔNG  | 30      | Frame rate                      |
+# | duration_ms | int  | ❌ KHÔNG  | auto    | Thời lượng tổng (auto từ video) |
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# video_sequence (BẮT BUỘC - phải có ít nhất 1 video)
+# ═══════════════════════════════════════════════════════════════════════════════
+# | Tham số           | Kiểu   | Bắt buộc? | Default | Mô tả                        |
+# | source            | string | ✅ CÓ     | -       | Đường dẫn file video         |
+# | timeline_priority | int    | ❌ KHÔNG  | 2       | Thứ tự render                |
+# | start_trim_ms     | int    | ❌ KHÔNG  | 0       | Cắt từ đầu source (ms)       |
+# | duration_ms       | int    | ❌ KHÔNG  | full    | Thời lượng (ms)              |
+# | volume            | float  | ❌ KHÔNG  | 1.0     | Âm lượng (0-1)               |
+# | speed             | float  | ❌ KHÔNG  | 1.0     | Tốc độ phát                  |
+# | transform         | object | ❌ KHÔNG  | default | x, y, scale_x, scale_y, etc. |
+# | intro_animation   | object | ❌ KHÔNG  | null    | {type, duration_ms}          |
+# | outro_animation   | object | ❌ KHÔNG  | null    | {type, duration_ms}          |
+# | transition_to_next| object | ❌ KHÔNG  | null    | {type, duration_ms}          |
+# | background_fill   | object | ❌ KHÔNG  | null    | {type, intensity, color}     |
+# | mask              | object | ❌ KHÔNG  | null    | {type, size, feather, invert}|
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# audios (TÙY CHỌN - nếu không gửi sẽ mặc định là [])
+# ═══════════════════════════════════════════════════════════════════════════════
+# | Tham số      | Kiểu   | Bắt buộc? | Default | Mô tả                    |
+# | source       | string | ✅ CÓ     | -       | Đường dẫn file audio     |
+# | start_ms     | int    | ❌ KHÔNG  | 0       | Vị trí trên timeline     |
+# | duration_ms  | int    | ❌ KHÔNG  | full    | Thời lượng               |
+# | volume       | float  | ❌ KHÔNG  | 1.0     | Âm lượng (0-1)           |
+# | fade_in_ms   | int    | ❌ KHÔNG  | 0       | Fade in (ms)             |
+# | fade_out_ms  | int    | ❌ KHÔNG  | 0       | Fade out (ms)            |
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# effects (TÙY CHỌN - nếu không gửi sẽ mặc định là [])
+# ═══════════════════════════════════════════════════════════════════════════════
+# | Tham số     | Kiểu   | Bắt buộc? | Default | Mô tả                        |
+# | type        | string | ✅ CÓ     | -       | Tên effect (từ /get_*)       |
+# | duration_ms | int    | ✅ CÓ     | -       | Thời lượng effect            |
+# | category    | string | ❌ KHÔNG  | scene   | scene hoặc character         |
+# | start_ms    | int    | ❌ KHÔNG  | 0       | Thời điểm bắt đầu            |
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# filters (TÙY CHỌN - nếu không gửi sẽ mặc định là [])
+# ═══════════════════════════════════════════════════════════════════════════════
+# | Tham số     | Kiểu   | Bắt buộc? | Default | Mô tả                        |
+# | type        | string | ✅ CÓ     | -       | Tên filter (từ /get_filter_types) |
+# | duration_ms | int    | ✅ CÓ     | -       | Thời lượng filter            |
+# | start_ms    | int    | ❌ KHÔNG  | 0       | Thời điểm bắt đầu            |
+# | intensity   | float  | ❌ KHÔNG  | 100     | Cường độ (0-100)             |
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# images (TÙY CHỌN - nếu không gửi sẽ mặc định là [])
+# ═══════════════════════════════════════════════════════════════════════════════
+# | Tham số     | Kiểu   | Bắt buộc? | Default | Mô tả                        |
+# | source      | string | ✅ CÓ     | -       | Đường dẫn file image         |
+# | start_ms    | int    | ❌ KHÔNG  | 0       | Thời điểm bắt đầu            |
+# | duration_ms | int    | ❌ KHÔNG  | 3000    | Thời lượng hiển thị          |
+# | position    | object | ❌ KHÔNG  | {0,0}   | {x, y} vị trí (-1 to 1)      |
+# | scale       | float  | ❌ KHÔNG  | 1.0     | Tỷ lệ scale                  |
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# texts (TÙY CHỌN - nếu không gửi sẽ mặc định là [])
+# ═══════════════════════════════════════════════════════════════════════════════
+# | Tham số     | Kiểu   | Bắt buộc? | Default | Mô tả                        |
+# | content     | string | ✅ CÓ     | -       | Nội dung text                |
+# | duration_ms | int    | ✅ CÓ     | -       | Thời lượng hiển thị          |
+# | start_ms    | int    | ❌ KHÔNG  | 0       | Thời điểm bắt đầu            |
+# | position    | object | ❌ KHÔNG  | {0,0}   | {x, y} vị trí                |
+# | style       | object | ❌ KHÔNG  | default | font, size, color, bold, etc.|
+# | border      | object | ❌ KHÔNG  | null    | color, width, alpha          |
+# | shadow      | object | ❌ KHÔNG  | null    | color, alpha, distance, etc. |
+# | animation   | object | ❌ KHÔNG  | null    | intro, loop, outro           |
+
+# 📋 Response thành công (200)
+# {
+#   "success": true,
+#   "output": {
+#     "draft_id": "abc123",
+#     "draft_name": "project_abc123",
+#     "draft_folder": "C:\\Users\\...\\CapCut\\...",
+#     "canvas": {"width": 1080, "height": 1920, "fps": 30},
+#     "processing_results": {
+#       "video_sequence": {"count": 1, "status": "..."},
+#       "audios": {"count": 0, "status": "..."},
+#       ...
+#     }
+#   },
+#   "error": ""
+# }
+
+# 📋 Response lỗi validation (400)
+# {
+#   "success": false,
+#   "output": "",
+#   "error": "Validation failed: video_sequence: video_sequence is required and must contain at least 1 video item"
+# }
+
+
+# ====================================================================================================
 # 📁 DRAFT MANAGEMENT ENDPOINTS
 # ====================================================================================================
 
@@ -1055,6 +1264,82 @@ curl -X POST http://localhost:8000/save_draft \
   -d '{"draft_id": "YOUR_DRAFT_ID"}'
 
 # Bước 14: Mở CapCut và tìm draft "my_project" trong Projects
+
+
+# ====================================================================================================
+# 🎞️ KEYFRAME ENDPOINTS
+# ====================================================================================================
+
+
+# ----------------------------------------------------------------------------------------------------
+# 🎞️ API: Thêm Keyframe (`/add_keyframe`)
+# ----------------------------------------------------------------------------------------------------
+# API này thêm keyframe animation vào video/image segment.
+
+# 🔌 Endpoint Info
+# | Method | URL                               |
+# | POST   | http://localhost:8000/add_keyframe |
+
+# 💻 cURL Request (Full Options)
+curl -X POST http://localhost:8000/add_keyframe \
+  -H "Content-Type: application/json" \
+  -d '{
+    "draft_id": "YOUR_DRAFT_ID",
+    "property": "rotation",
+    "time_offset": 0,
+    "value": 0,
+    "segment_index": 0,
+    "track_name": null
+  }'
+
+# 📋 Chi Tiết Tham Số
+# 🔴 BẮT BUỘC (Required)
+# | Tham số     | Kiểu   | Mô tả                                           |
+# | draft_id    | string | ID draft từ /create_draft.                      |
+# | property    | string | Tên thuộc tính keyframe.                        |
+# | time_offset | float  | Thời gian từ đầu segment (giây).                |
+# | value       | float  | Giá trị tại keyframe.                           |
+
+# 🟡 OPTIONAL
+# | Tham số       | Default | Mô tả                              |
+# | segment_index | 0       | Index của video segment (0-based). |
+# | track_name    | null    | Tên video track.                   |
+
+# 📌 Các thuộc tính keyframe hỗ trợ:
+# | Thuộc tính    | Mô tả                                    | Áp dụng      |
+# | position_x    | Vị trí ngang (-1 đến 1)                  | Video/Image  |
+# | position_y    | Vị trí dọc (-1 đến 1)                    | Video/Image  |
+# | rotation      | Góc xoay (độ, chiều kim đồng hồ)         | Video/Image  |
+# | scale_x       | Tỷ lệ ngang                              | Video/Image  |
+# | scale_y       | Tỷ lệ dọc                                | Video/Image  |
+# | uniform_scale | Tỷ lệ đồng nhất X/Y                      | Video/Image  |
+# | alpha         | Độ trong suốt (0-1)                      | Video        |
+# | saturation    | Độ bão hòa (-1 đến 1)                    | Video        |
+# | contrast      | Độ tương phản (-1 đến 1)                 | Video        |
+# | brightness    | Độ sáng (-1 đến 1)                       | Video        |
+# | volume        | Âm lượng                                 | Video/Audio  |
+
+# 💡 Ví dụ: Xoay video từ 0° đến 360° trong 4 giây
+curl -X POST http://localhost:8000/add_keyframe \
+  -H "Content-Type: application/json" \
+  -d '{"draft_id": "ID", "property": "rotation", "time_offset": 0, "value": 0}'
+
+curl -X POST http://localhost:8000/add_keyframe \
+  -H "Content-Type: application/json" \
+  -d '{"draft_id": "ID", "property": "rotation", "time_offset": 4, "value": 360}'
+
+
+# ----------------------------------------------------------------------------------------------------
+# 📋 API: Lấy Danh Sách Keyframe Properties (`/get_keyframe_properties`)
+# ----------------------------------------------------------------------------------------------------
+# API này trả về danh sách các thuộc tính keyframe có thể sử dụng.
+
+# 🔌 Endpoint Info
+# | Method | URL                                        |
+# | GET    | http://localhost:8000/get_keyframe_properties |
+
+# 💻 cURL Request
+curl -X GET http://localhost:8000/get_keyframe_properties
 
 
 # ====================================================================================================

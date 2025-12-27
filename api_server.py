@@ -27,6 +27,10 @@ from api_utils import (
 )
 from settings.local import PORT, DEBUG, DRAFT_FOLDER
 
+# Import Pydantic models for composite endpoint validation
+from model import EditRequest
+from pydantic import ValidationError
+
 app = Flask(__name__)
 
 
@@ -142,6 +146,542 @@ def list_drafts():
         return make_response(True, {"drafts": drafts})
     except Exception as e:
         return make_response(False, error=f"Error listing drafts: {str(e)}")
+
+
+# ============================================================
+# COMPOSITE PROJECT API ENDPOINT
+# ============================================================
+
+@app.route('/create_amv_project_video', methods=['POST'])
+def create_amv_project_video():
+    """
+    Create a complete video project from a single JSON request.
+    
+    This is a composite endpoint that:
+    1. Validates the request using Pydantic models
+    2. Creates a new draft
+    3. Processes video_sequence (REQUIRED)
+    4. Processes optional components: audios, effects, filters, images, texts
+    5. Saves the draft and returns the result
+    
+    Request body: See EditRequest model in model.py
+    
+    Returns:
+        200: Success with draft_id and project info
+        400: Validation error with details
+    """
+    try:
+        # ===== 1. GET RAW JSON =====
+        raw_json = request.get_json()
+        if not raw_json:
+            return jsonify({
+                "success": False,
+                "output": "",
+                "error": "Request body is required"
+            }), 400
+        
+        # ===== 2. VALIDATE WITH PYDANTIC =====
+        try:
+            edit_request = EditRequest(**raw_json)
+        except ValidationError as ve:
+            # Format Pydantic validation errors
+            errors = []
+            for error in ve.errors():
+                field = " -> ".join(str(loc) for loc in error['loc'])
+                msg = error['msg']
+                errors.append(f"{field}: {msg}")
+            
+            return jsonify({
+                "success": False,
+                "output": "",
+                "error": f"Validation failed: {'; '.join(errors)}"
+            }), 400
+        
+        # ===== 3. CREATE DRAFT =====
+        canvas = edit_request.canvas_config
+        draft_name = f"project_{generate_draft_id()[:8]}"
+        draft_folder_path = DRAFT_FOLDER
+        
+        # Initialize DraftFolder
+        draft_folder = cc.DraftFolder(draft_folder_path)
+        
+        # Create the draft with canvas config
+        script = draft_folder.create_draft(
+            draft_name,
+            canvas.width,
+            canvas.height,
+            fps=canvas.fps,
+            allow_replace=True
+        )
+        
+        # Add default tracks
+        script.add_track(cc.TrackType.video)
+        script.add_track(cc.TrackType.audio)
+        script.add_track(cc.TrackType.text)
+        
+        # Generate draft ID and store in cache
+        draft_id = generate_draft_id()
+        store_draft(draft_id, script, draft_folder_path, draft_name)
+        
+        # ===== 4. PROCESS EACH COMPONENT =====
+        processing_results = {
+            "video_sequence": {"count": 0, "status": "pending"},
+            "audios": {"count": 0, "status": "pending"},
+            "effects": {"count": 0, "status": "pending"},
+            "filters": {"count": 0, "status": "pending"},
+            "images": {"count": 0, "status": "pending"},
+            "texts": {"count": 0, "status": "pending"}
+        }
+        
+        # --- 4.1 VIDEO SEQUENCE (Required) ---
+        # Import animation types for video
+        from pycapcut.metadata.video_intro import IntroType
+        from pycapcut.metadata.video_outro import OutroType
+        
+        # Videos are added sequentially (concatenated on timeline)
+        current_timeline_position = 0  # Track position in microseconds
+        video_count = len(edit_request.video_sequence)
+        video_segments_list = []  # Store segments for transition processing
+        
+        for idx, video_item in enumerate(edit_request.video_sequence):
+            try:
+                # Create video material
+                video_mat = cc.VideoMaterial(video_item.source)
+                
+                # Calculate duration (ms to microseconds)
+                if video_item.duration_ms:
+                    segment_duration = video_item.duration_ms * 1000  # ms to us
+                else:
+                    segment_duration = video_mat.duration  # Full video duration
+                
+                # Calculate source trim
+                source_start = video_item.start_trim_ms * 1000 if video_item.start_trim_ms else 0
+                
+                # Create clip settings from transform
+                transform = video_item.transform
+                clip_settings = cc.ClipSettings(
+                    transform_x=transform.x if transform else 0,
+                    transform_y=transform.y if transform else 0,
+                    scale_x=transform.scale_x if transform else 1.0,
+                    scale_y=transform.scale_y if transform else 1.0,
+                    rotation=transform.rotation if transform else 0,
+                    alpha=transform.alpha if transform else 1.0,
+                    flip_horizontal=transform.flip_horizontal if transform else False,
+                    flip_vertical=transform.flip_vertical if transform else False
+                )
+                
+                # Create video segment
+                video_seg = cc.VideoSegment(
+                    video_mat,
+                    trange(current_timeline_position, segment_duration),
+                    source_timerange=trange(source_start, segment_duration) if source_start else None,
+                    speed=video_item.speed if video_item.speed != 1.0 else None,
+                    volume=video_item.volume,
+                    clip_settings=clip_settings
+                )
+                
+                # --- Add intro animation ---
+                if video_item.intro_animation:
+                    intro_anim_type = getattr(IntroType, video_item.intro_animation.type, None)
+                    if intro_anim_type:
+                        duration_us = video_item.intro_animation.duration_ms * 1000 if video_item.intro_animation.duration_ms else None
+                        video_seg.add_animation(intro_anim_type, duration_us)
+                
+                # --- Add outro animation ---
+                if video_item.outro_animation:
+                    outro_anim_type = getattr(OutroType, video_item.outro_animation.type, None)
+                    if outro_anim_type:
+                        duration_us = video_item.outro_animation.duration_ms * 1000 if video_item.outro_animation.duration_ms else None
+                        video_seg.add_animation(outro_anim_type, duration_us)
+                
+                # --- Add background fill ---
+                if video_item.background_fill:
+                    bg = video_item.background_fill
+                    fill_type = "blur" if bg.type == "blur" else "color"
+                    blur_value = bg.intensity if bg.type == "blur" else 0
+                    color_value = bg.color if hasattr(bg, 'color') and bg.color else "#00000000"
+                    video_seg.add_background_filling(fill_type, blur=blur_value, color=color_value)
+                
+                # --- Add mask ---
+                if video_item.mask:
+                    mask_config = video_item.mask
+                    mask_type = getattr(cc.MaskType, mask_config.type, None)
+                    if mask_type:
+                        try:
+                            video_seg.add_mask(
+                                mask_type,
+                                center_x=mask_config.center_x if hasattr(mask_config, 'center_x') else 0,
+                                center_y=mask_config.center_y if hasattr(mask_config, 'center_y') else 0,
+                                size=mask_config.size,
+                                rotation=mask_config.rotation if hasattr(mask_config, 'rotation') else 0,
+                                feather=mask_config.feather,
+                                invert=mask_config.invert,
+                                round_corner=mask_config.round_corner if mask_config.round_corner else None
+                            )
+                        except Exception as mask_err:
+                            pass  # Mask error shouldn't fail the request
+                
+                # Add to script
+                script.add_segment(video_seg)
+                video_segments_list.append(video_seg)
+                
+                # Update timeline position for next video (concatenate)
+                current_timeline_position += segment_duration
+                
+            except Exception as ve:
+                processing_results["video_sequence"]["status"] = f"Error on video {idx}: {str(ve)}"
+                raise ve
+        
+        # --- Add transitions (after all segments are added) ---
+        for idx, video_item in enumerate(edit_request.video_sequence):
+            if video_item.transition_to_next and idx < len(video_segments_list) - 1:
+                try:
+                    trans_config = video_item.transition_to_next
+                    trans_type = getattr(cc.TransitionType, trans_config.type, None)
+                    if trans_type:
+                        duration_us = trans_config.duration_ms * 1000 if trans_config.duration_ms else None
+                        video_segments_list[idx].add_transition(trans_type, duration=duration_us)
+                        script.materials.transitions.append(video_segments_list[idx].transition)
+                except Exception as te:
+                    pass  # Transition error shouldn't fail the whole request
+        
+        processing_results["video_sequence"]["count"] = video_count
+        processing_results["video_sequence"]["status"] = "completed"
+        
+        # Calculate total video duration
+        total_video_duration_ms = current_timeline_position // 1000
+        
+        # --- 4.2 AUDIOS (Optional) ---
+        audio_count = len(edit_request.audios)
+        
+        for idx, audio_item in enumerate(edit_request.audios):
+            try:
+                # Create audio material
+                audio_mat = cc.AudioMaterial(audio_item.source)
+                
+                # Calculate duration
+                if audio_item.duration_ms:
+                    audio_duration = audio_item.duration_ms * 1000  # ms to us
+                else:
+                    audio_duration = audio_mat.duration  # Full audio duration
+                
+                # Calculate positions
+                timeline_start = audio_item.start_ms * 1000  # ms to us
+                source_start = audio_item.start_trim_ms * 1000 if audio_item.start_trim_ms else 0
+                
+                # Create audio segment
+                audio_seg = cc.AudioSegment(
+                    audio_mat,
+                    trange(timeline_start, audio_duration),
+                    source_timerange=trange(source_start, audio_duration) if source_start else None,
+                    speed=audio_item.speed if audio_item.speed != 1.0 else None,
+                    volume=audio_item.volume
+                )
+                
+                # Add to script
+                script.add_segment(audio_seg)
+                
+                # Apply fade in/out if specified
+                if audio_item.fade_in_ms > 0 or audio_item.fade_out_ms > 0:
+                    try:
+                        audio_seg.set_audio_fade(
+                            fade_in=audio_item.fade_in_ms / 1000.0,  # Convert to seconds
+                            fade_out=audio_item.fade_out_ms / 1000.0
+                        )
+                    except:
+                        pass  # Fade may not be supported
+                
+            except Exception as ae:
+                processing_results["audios"]["status"] = f"Error on audio {idx}: {str(ae)}"
+                # Continue with other audios, don't fail entire request
+        
+        processing_results["audios"]["count"] = audio_count
+        processing_results["audios"]["status"] = "completed" if audio_count > 0 else "skipped (no audios)"
+        
+        # --- 4.3 EFFECTS (Optional) ---
+        effects_count = len(edit_request.effects)
+        
+        for idx, effect_item in enumerate(edit_request.effects):
+            try:
+                # Get effect type
+                effect_type = None
+                if effect_item.category == 'scene':
+                    effect_type = getattr(cc.VideoSceneEffectType, effect_item.type, None)
+                else:
+                    effect_type = getattr(cc.VideoCharacterEffectType, effect_item.type, None)
+                
+                if effect_type:
+                    # Add effect track
+                    track_name = f"effect_{idx:02d}"
+                    try:
+                        script.add_track(cc.TrackType.effect, track_name=track_name)
+                    except:
+                        pass
+                    
+                    # Add effect
+                    script.add_effect(
+                        effect_type,
+                        trange(effect_item.start_ms * 1000, effect_item.duration_ms * 1000),
+                        track_name=track_name,
+                        params=effect_item.params
+                    )
+            except Exception as ee:
+                processing_results["effects"]["status"] = f"Error on effect {idx}: {str(ee)}"
+        
+        processing_results["effects"]["count"] = effects_count
+        processing_results["effects"]["status"] = "completed" if effects_count > 0 else "skipped (no effects)"
+        
+        # --- 4.4 FILTERS (Optional) ---
+        filters_count = len(edit_request.filters)
+        
+        for idx, filter_item in enumerate(edit_request.filters):
+            try:
+                # Get filter type
+                filter_type = getattr(cc.FilterType, filter_item.type, None)
+                
+                if filter_type:
+                    # Add filter track
+                    track_name = f"filter_{idx:02d}"
+                    try:
+                        script.add_track(cc.TrackType.filter, track_name=track_name)
+                    except:
+                        pass
+                    
+                    # Add filter
+                    script.add_filter(
+                        filter_type,
+                        trange(filter_item.start_ms * 1000, filter_item.duration_ms * 1000),
+                        track_name=track_name,
+                        intensity=filter_item.intensity
+                    )
+            except Exception as fe:
+                processing_results["filters"]["status"] = f"Error on filter {idx}: {str(fe)}"
+        
+        processing_results["filters"]["count"] = filters_count
+        processing_results["filters"]["status"] = "completed" if filters_count > 0 else "skipped (no filters)"
+        
+        # --- 4.5 IMAGES (Optional) ---
+        images_count = len(edit_request.images)
+        
+        for idx, image_item in enumerate(edit_request.images):
+            try:
+                # Create image material (images use VideoMaterial in pyCapCut)
+                image_mat = cc.VideoMaterial(image_item.source)
+                
+                # Get position
+                pos = image_item.position
+                transform_x = pos.x if pos else 0
+                transform_y = pos.y if pos else 0
+                
+                # Get scale
+                scale_x = image_item.scale_x if image_item.scale_x else image_item.scale
+                scale_y = image_item.scale_y if image_item.scale_y else image_item.scale
+                
+                # Create clip settings
+                clip_settings = cc.ClipSettings(
+                    transform_x=transform_x,
+                    transform_y=transform_y,
+                    scale_x=scale_x,
+                    scale_y=scale_y
+                )
+                
+                # Create image segment
+                image_seg = cc.VideoSegment(
+                    image_mat,
+                    trange(image_item.start_ms * 1000, image_item.duration_ms * 1000),
+                    clip_settings=clip_settings
+                )
+                
+                # --- Add image intro animation ---
+                if image_item.intro_animation:
+                    intro_anim_type = getattr(IntroType, image_item.intro_animation.type, None)
+                    if intro_anim_type:
+                        duration_us = image_item.intro_animation.duration_ms * 1000 if image_item.intro_animation.duration_ms else None
+                        image_seg.add_animation(intro_anim_type, duration_us)
+                
+                # --- Add image outro animation ---
+                if image_item.outro_animation:
+                    outro_anim_type = getattr(OutroType, image_item.outro_animation.type, None)
+                    if outro_anim_type:
+                        duration_us = image_item.outro_animation.duration_ms * 1000 if image_item.outro_animation.duration_ms else None
+                        image_seg.add_animation(outro_anim_type, duration_us)
+                
+                # Add to script (on separate track for overlay)
+                track_name = f"image_{idx:02d}"
+                try:
+                    script.add_track(cc.TrackType.video, track_name=track_name)
+                except:
+                    pass
+                script.add_segment(image_seg, track_name=track_name)
+                
+            except Exception as ie:
+                processing_results["images"]["status"] = f"Error on image {idx}: {str(ie)}"
+        
+        processing_results["images"]["count"] = images_count
+        processing_results["images"]["status"] = "completed" if images_count > 0 else "skipped (no images)"
+        
+        # --- 4.6 TEXTS (Optional) ---
+        texts_count = len(edit_request.texts)
+        
+        for idx, text_item in enumerate(edit_request.texts):
+            try:
+                # Get position
+                pos = text_item.position
+                transform_x = pos.x if pos else 0
+                transform_y = pos.y if pos else 0
+                
+                # Get style
+                style = text_item.style
+                
+                # Parse color
+                color = hex_to_rgb(style.color if style else '#FFFFFF')
+                
+                # Create text style
+                text_style = cc.TextStyle(
+                    size=style.size if style else 8.0,
+                    bold=style.bold if style else False,
+                    italic=style.italic if style else False,
+                    underline=style.underline if style else False,
+                    color=color,
+                    alpha=style.alpha if style else 1.0,
+                    align=style.align if style else 1,
+                    vertical=style.vertical if style else False,
+                    letter_spacing=style.letter_spacing if style else 0,
+                    line_spacing=style.line_spacing if style else 0,
+                    auto_wrapping=style.auto_wrapping if style else False,
+                    max_line_width=style.max_line_width if style else 0.82
+                )
+                
+                # Create clip settings
+                clip_settings = cc.ClipSettings(
+                    transform_x=transform_x,
+                    transform_y=transform_y
+                )
+                
+                # Get font type if specified
+                font_type = None
+                if style and style.font:
+                    try:
+                        font_type = getattr(cc.FontType, style.font, None)
+                    except:
+                        pass
+                
+                # Parse border settings
+                border = None
+                if text_item.border:
+                    border_color = hex_to_rgb(text_item.border.color)
+                    border = cc.TextBorder(
+                        alpha=text_item.border.alpha,
+                        color=border_color,
+                        width=text_item.border.width
+                    )
+                
+                # Parse shadow settings
+                shadow = None
+                if text_item.shadow:
+                    shadow_color = hex_to_rgb(text_item.shadow.color)
+                    shadow = cc.TextShadow(
+                        alpha=text_item.shadow.alpha,
+                        color=shadow_color,
+                        diffuse=text_item.shadow.diffuse,
+                        distance=text_item.shadow.distance,
+                        angle=text_item.shadow.angle
+                    )
+                
+                # Parse background settings
+                background = None
+                if text_item.background:
+                    background = cc.TextBackground(
+                        color=text_item.background.color,
+                        style=text_item.background.style,
+                        alpha=text_item.background.alpha,
+                        round_radius=text_item.background.round_radius,
+                        height=text_item.background.height,
+                        width=text_item.background.width,
+                        horizontal_offset=text_item.background.horizontal_offset,
+                        vertical_offset=text_item.background.vertical_offset
+                    )
+                
+                # Create text segment
+                text_seg = cc.TextSegment(
+                    text_item.content,
+                    trange(text_item.start_ms * 1000, text_item.duration_ms * 1000),
+                    font=font_type,
+                    style=text_style,
+                    clip_settings=clip_settings,
+                    border=border,
+                    background=background,
+                    shadow=shadow
+                )
+                
+                # Add to script
+                script.add_segment(text_seg)
+                
+                # --- Add text animations ---
+                if text_item.animation:
+                    try:
+                        # Add intro animation FIRST (before loop)
+                        if text_item.animation.intro:
+                            intro_type = getattr(cc.TextIntro, text_item.animation.intro.type, None)
+                            if intro_type:
+                                duration_us = text_item.animation.intro.duration_ms * 1000 if text_item.animation.intro.duration_ms else 500000
+                                text_seg.add_animation(intro_type, duration=duration_us)
+                        
+                        # Add outro animation BEFORE loop
+                        if text_item.animation.outro:
+                            outro_type = getattr(cc.TextOutro, text_item.animation.outro.type, None)
+                            if outro_type:
+                                duration_us = text_item.animation.outro.duration_ms * 1000 if text_item.animation.outro.duration_ms else 500000
+                                text_seg.add_animation(outro_type, duration=duration_us)
+                        
+                        # Add loop animation LAST (after intro/outro)
+                        if text_item.animation.loop:
+                            loop_type = getattr(cc.TextLoopAnim, text_item.animation.loop.type, None)
+                            if loop_type:
+                                text_seg.add_animation(loop_type)
+                        
+                        # CRUCIAL: Add animation material to script materials list
+                        if text_seg.animations_instance is not None:
+                            if text_seg.animations_instance not in script.materials.animations:
+                                script.materials.animations.append(text_seg.animations_instance)
+                    except Exception as anim_err:
+                        pass  # Animation import/apply error shouldn't fail the request
+                
+            except Exception as te:
+                processing_results["texts"]["status"] = f"Error on text {idx}: {str(te)}"
+        
+        processing_results["texts"]["count"] = texts_count
+        processing_results["texts"]["status"] = "completed" if texts_count > 0 else "skipped (no texts)"
+        
+        # ===== 5. SAVE DRAFT =====
+        script.save()
+        
+        # ===== 6. RETURN SUCCESS RESPONSE =====
+        return jsonify({
+            "success": True,
+            "output": {
+                "draft_id": draft_id,
+                "draft_name": draft_name,
+                "draft_folder": draft_folder_path,
+                "canvas": {
+                    "width": canvas.width,
+                    "height": canvas.height,
+                    "fps": canvas.fps,
+                    "duration_ms": canvas.duration_ms
+                },
+                "processing_results": processing_results,
+                "message": "Project created successfully. Note: Component processing is pending implementation."
+            },
+            "error": ""
+        }), 200
+        
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({
+            "success": False,
+            "output": "",
+            "error": f"Error creating project: {str(e)}"
+        }), 400
 
 
 # ============================================================
@@ -991,6 +1531,200 @@ def add_audio_effect():
     except Exception as e:
         traceback.print_exc()
         return make_response(False, error=f"Error adding audio effect: {str(e)}")
+
+
+# ============================================================
+# VIDEO ANIMATION ENDPOINTS
+# ============================================================
+
+@app.route('/add_video_animation', methods=['POST'])
+def add_video_animation():
+    """Add intro/outro/combo animation to a video segment
+    
+    Request body:
+        draft_id (str): The draft ID
+        animation_type (str): Animation type name (e.g., "Neon Love", "Snowflake_Veil")
+        animation_category (str): "intro", "outro", or "combo"
+        segment_index (int, optional): Index of the video segment (0-based), default 0
+        duration (float, optional): Animation duration in seconds (uses default if not specified)
+        track_name (str, optional): Video track name
+    """
+    try:
+        from pycapcut.metadata.video_intro import IntroType
+        from pycapcut.metadata.video_outro import OutroType
+        from pycapcut.metadata.video_group_animation import GroupAnimationType
+        
+        data = request.get_json()
+        draft_id = data.get('draft_id')
+        animation_name = data.get('animation_type')
+        animation_category = data.get('animation_category', 'intro').lower()
+        
+        if not draft_id:
+            return make_response(False, error="Missing required parameter 'draft_id'")
+        if not animation_name:
+            return make_response(False, error="Missing required parameter 'animation_type'")
+        
+        draft_data = get_draft(draft_id)
+        if not draft_data:
+            return make_response(False, error=f"Draft {draft_id} not found in cache")
+        
+        script, _, _ = draft_data
+        
+        # Parse parameters
+        segment_index = data.get('segment_index', 0)
+        track_name = data.get('track_name')
+        duration = data.get('duration')
+        
+        # Get animation type from the appropriate category
+        if animation_category == 'intro':
+            anim_type = getattr(IntroType, animation_name, None)
+            category_display = "intro"
+        elif animation_category == 'outro':
+            anim_type = getattr(OutroType, animation_name, None)
+            category_display = "outro"
+        elif animation_category == 'combo' or animation_category == 'group':
+            anim_type = getattr(GroupAnimationType, animation_name, None)
+            category_display = "combo"
+        else:
+            return make_response(False, error=f"Invalid animation_category '{animation_category}'. Valid: intro, outro, combo")
+        
+        if not anim_type:
+            return make_response(False, error=f"Animation '{animation_name}' not found in {animation_category} animations")
+        
+        # Find the video track and segment
+        video_track = None
+        for name, track in script.tracks.items():
+            if track.track_type == cc.TrackType.video:
+                if track_name is None or name == track_name:
+                    video_track = track
+                    break
+        
+        if not video_track:
+            return make_response(False, error="No video track found")
+        
+        if segment_index >= len(video_track.segments):
+            return make_response(False, error=f"Segment index {segment_index} out of range (0-{len(video_track.segments)-1})")
+        
+        # Add animation to the segment
+        segment = video_track.segments[segment_index]
+        
+        if duration:
+            duration_us = int(duration * SEC)
+            segment.add_animation(anim_type, duration_us)
+        else:
+            segment.add_animation(anim_type)
+        
+        return make_response(True, {
+            "message": f"Video {category_display} animation added successfully",
+            "animation": animation_name,
+            "category": animation_category
+        })
+        
+    except Exception as e:
+        traceback.print_exc()
+        return make_response(False, error=f"Error adding video animation: {str(e)}")
+
+
+# ============================================================
+# KEYFRAME ENDPOINTS
+# ============================================================
+
+@app.route('/add_keyframe', methods=['POST'])
+def add_keyframe():
+    """Add a keyframe to a video/image segment
+    
+    Request body:
+        draft_id (str): The draft ID
+        property (str): Keyframe property (position_x, position_y, rotation, scale_x, scale_y, uniform_scale, alpha, saturation, contrast, brightness, volume)
+        time_offset (float): Time offset from segment start in seconds
+        value (float): Value at this keyframe
+        segment_index (int, optional): Index of the video segment (0-based), default 0
+        track_name (str, optional): Video track name
+    """
+    try:
+        from pycapcut.keyframe import KeyframeProperty
+        
+        data = request.get_json()
+        draft_id = data.get('draft_id')
+        property_name = data.get('property')
+        time_offset = data.get('time_offset')
+        value = data.get('value')
+        
+        if not draft_id:
+            return make_response(False, error="Missing required parameter 'draft_id'")
+        if not property_name:
+            return make_response(False, error="Missing required parameter 'property'")
+        if time_offset is None:
+            return make_response(False, error="Missing required parameter 'time_offset'")
+        if value is None:
+            return make_response(False, error="Missing required parameter 'value'")
+        
+        draft_data = get_draft(draft_id)
+        if not draft_data:
+            return make_response(False, error=f"Draft {draft_id} not found in cache")
+        
+        script, _, _ = draft_data
+        
+        # Parse parameters
+        segment_index = data.get('segment_index', 0)
+        track_name = data.get('track_name')
+        
+        # Get keyframe property
+        kf_property = getattr(KeyframeProperty, property_name, None)
+        if not kf_property:
+            valid_props = [p.name for p in KeyframeProperty]
+            return make_response(False, error=f"Invalid property '{property_name}'. Valid: {valid_props}")
+        
+        # Find the video track and segment
+        video_track = None
+        for name, track in script.tracks.items():
+            if track.track_type == cc.TrackType.video:
+                if track_name is None or name == track_name:
+                    video_track = track
+                    break
+        
+        if not video_track:
+            return make_response(False, error="No video track found")
+        
+        if segment_index >= len(video_track.segments):
+            return make_response(False, error=f"Segment index {segment_index} out of range (0-{len(video_track.segments)-1})")
+        
+        # Convert time_offset from seconds to microseconds
+        time_offset_us = int(time_offset * SEC)
+        
+        # Add keyframe to the segment
+        segment = video_track.segments[segment_index]
+        segment.add_keyframe(kf_property, time_offset_us, value)
+        
+        return make_response(True, {
+            "message": f"Keyframe added successfully",
+            "property": property_name,
+            "time_offset": time_offset,
+            "value": value
+        })
+        
+    except Exception as e:
+        traceback.print_exc()
+        return make_response(False, error=f"Error adding keyframe: {str(e)}")
+
+
+@app.route('/get_keyframe_properties', methods=['GET'])
+def get_keyframe_properties():
+    """Get list of available keyframe properties"""
+    try:
+        from pycapcut.keyframe import KeyframeProperty
+        
+        properties = {}
+        for prop in KeyframeProperty:
+            properties[prop.name] = {
+                "value": prop.value,
+                "description": prop.__doc__ if prop.__doc__ else ""
+            }
+        
+        return make_response(True, {"properties": properties})
+        
+    except Exception as e:
+        return make_response(False, error=f"Error getting keyframe properties: {str(e)}")
 
 
 @app.route('/add_tone_effect', methods=['POST'])
@@ -1997,6 +2731,9 @@ def index():
         "service": "pyCapCut API Server",
         "version": "2.0.0",
         "endpoints": {
+            "composite_project": [
+                "POST /create_amv_project_video  (Create complete project from single JSON)"
+            ],
             "draft_management": [
                 "POST /create_draft",
                 "POST /save_draft",
@@ -2029,6 +2766,10 @@ def index():
                 "POST /add_speech_to_song",
                 "POST /add_audio_fade",
                 "POST /add_video_fade"
+            ],
+            "keyframes": [
+                "POST /add_keyframe",
+                "GET /get_keyframe_properties"
             ],
             "metadata": [
                 "GET /get_font_types",

@@ -97,6 +97,18 @@ class VideoEffect:
     """应用目标类型, 0: 片段, 2: 全局"""
 
     adjust_params: List[EffectParamInstance]
+    
+    # === NEW FIELDS ===
+    path: str
+    """Đường dẫn file effect đã cache"""
+    category_name: str
+    """Tên category"""
+    category_id: str
+    """ID category"""
+    source_platform: int
+    """Platform source"""
+    request_id: str
+    """Request ID"""
 
     def __init__(self, effect_meta: Union[VideoSceneEffectType, VideoCharacterEffectType],
                  params: Optional[List[Optional[float]]] = None, *,
@@ -118,30 +130,40 @@ class VideoEffect:
         self.apply_target_type = apply_target_type
 
         self.adjust_params = effect_meta.value.parse_params(params)
+        
+        # Lấy các field mới từ EffectMeta
+        meta = effect_meta.value
+        self.path = getattr(meta, 'path', '') or ''
+        self.category_name = getattr(meta, 'category_name', '') or ''
+        self.category_id = getattr(meta, 'category_id', '') or ''
+        self.source_platform = getattr(meta, 'source_platform', 0) or 0
+        self.request_id = getattr(meta, 'request_id', '') or ''
 
     def export_json(self) -> Dict[str, Any]:
         return {
             "adjust_params": [param.export_json() for param in self.adjust_params],
+            "algorithm_artifact_path": "",
             "apply_target_type": self.apply_target_type,
             "apply_time_range": None,
-            "category_id": "",  # 一律设为空
-            "category_name": "",  # 一律设为空
+            "category_id": self.category_id,
+            "category_name": self.category_name,
             "common_keyframes": [],
             "disable_effect_faces": [],
             "effect_id": self.effect_id,
             "formula_id": "",
             "id": self.global_id,
             "name": self.name,
+            "path": self.path,  # QUAN TRỌNG: Cần có để effect hoạt động
             "platform": "all",
             "render_index": 11000,
+            "request_id": self.request_id,
             "resource_id": self.resource_id,
-            "source_platform": 0,
+            "source_platform": self.source_platform,
             "time_range": None,
             "track_render_index": 0,
             "type": self.effect_type,
             "value": 1.0,
             "version": ""
-            # 不导出path、request_id和algorithm_artifact_path字段
         }
 
 class Filter:
@@ -217,6 +239,13 @@ class Transition:
     """转场持续时间, 单位为微秒"""
     is_overlap: bool
     """是否与上一个片段重叠(?)"""
+    
+    # === NEW FIELDS for proper CapCut rendering ===
+    path: str
+    category_name: str
+    category_id: str
+    source_platform: int
+    request_id: str
 
     def __init__(self, effect_meta: TransitionType, duration: Optional[int] = None):
         """根据给定的转场元数据及持续时间构造一个转场对象"""
@@ -227,20 +256,30 @@ class Transition:
 
         self.duration = duration if duration is not None else effect_meta.value.default_duration
         self.is_overlap = effect_meta.value.is_overlap
+        
+        # New fields from TransitionMeta
+        meta = effect_meta.value
+        self.path = getattr(meta, 'path', '') or ''
+        self.category_name = getattr(meta, 'category_name', '') or ''
+        self.category_id = getattr(meta, 'category_id', '') or ''
+        self.source_platform = getattr(meta, 'source_platform', 0) or 0
+        self.request_id = getattr(meta, 'request_id', '') or ''
 
     def export_json(self) -> Dict[str, Any]:
         return {
-            "category_id": "",  # 一律设为空
-            "category_name": "",  # 一律设为空
+            "category_id": self.category_id,
+            "category_name": self.category_name,
             "duration": self.duration,
             "effect_id": self.effect_id,
             "id": self.global_id,
             "is_overlap": self.is_overlap,
             "name": self.name,
+            "path": self.path,  # QUAN TRỌNG: Cần có để transition hoạt động
             "platform": "all",
+            "request_id": self.request_id,
             "resource_id": self.resource_id,
+            "source_platform": self.source_platform,
             "type": "transition"
-            # 不导出path和request_id字段
         }
 
 class BackgroundFilling:

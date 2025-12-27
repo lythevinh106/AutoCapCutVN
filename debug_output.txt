@@ -1,0 +1,75 @@
+﻿============================================================
+FONTS FROM TEXTS
+============================================================
+  Font: font
+    ID: 7545054659858271504
+  Font: font
+    ID: 7542214368361057553
+  Font: ZYVNA Anemone
+    ID: 7013643679474651649
+
+============================================================
+ALL MATERIAL_ANIMATIONS
+============================================================
+  [0] Type: sticker_animation
+      Name: N/A
+      ID: 9F34810E-A9B5-49b1-9CE0-8119494BEB5A
+      Resource ID: N/A
+      Category: N/A
+      Raw keys: ['animations', 'id', 'multi_language_current', 'type']
+
+  [1] Type: sticker_animation
+      Name: N/A
+      ID: 10D325E3-39B9-4757-8CF8-95B03A7FD58C
+      Resource ID: N/A
+      Category: N/A
+      Raw keys: ['animations', 'id', 'multi_language_current', 'type']
+
+  [2] Type: sticker_animation
+      Name: N/A
+      ID: 66DB5B21-CF61-4889-81F2-ED998E806E75
+      Resource ID: N/A
+      Category: N/A
+      Raw keys: ['animations', 'id', 'multi_language_current', 'type']
+
+  [3] Type: sticker_animation
+      Name: N/A
+      ID: 770C2843-BD6C-4f09-BB0F-ACC3E9526E0E
+      Resource ID: N/A
+      Category: N/A
+      Raw keys: ['animations', 'id', 'multi_language_current', 'type']
+
+  [4] Type: sticker_animation
+      Name: N/A
+      ID: 2B7983E1-4D09-4697-BFDD-C1E70AE711F4
+      Resource ID: N/A
+      Category: N/A
+      Raw keys: ['animations', 'id', 'multi_language_current', 'type']
+
+  [5] Type: sticker_animation
+      Name: N/A
+      ID: 79AA227A-BF16-4e27-AF81-1D1C5C96B877
+      Resource ID: N/A
+      Category: N/A
+      Raw keys: ['animations', 'id', 'multi_language_current', 'type']
+
+  [6] Type: sticker_animation
+      Name: N/A
+      ID: 594372ED-3B69-4e6e-BA09-B9DEBD6BB62E
+      Resource ID: N/A
+      Category: N/A
+      Raw keys: ['animations', 'id', 'multi_language_current', 'type']
+
+============================================================
+TEXT TRACKS/SEGMENTS
+============================================================
+  Text Segment material_id: F3E8E920-5808-4d5f-B055-073A9C420018
+    extra_material_refs: ['2B7983E1-4D09-4697-BFDD-C1E70AE711F4']
+  Text Segment material_id: 1C31D274-4306-4041-9DA8-621D318A2BE8
+    extra_material_refs: ['79AA227A-BF16-4e27-AF81-1D1C5C96B877']
+  Text Segment material_id: 9005BAF2-19F1-47ab-A8FC-FC987585B83C
+    extra_material_refs: ['594372ED-3B69-4e6e-BA09-B9DEBD6BB62E']
+
+============================================================
+LOOKING FOR LOOP ANIMATIONS
+============================================================

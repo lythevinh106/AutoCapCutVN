@@ -190,3 +190,7 @@ class TextIntro(EffectEnum):
     顶出                 = AnimationMeta("顶出", True, 1.100, "7270918697991016962", "7270918697991016962", "931180ea7b9b1b3ecc88d860bf9f0752")
     顺序上滑             = AnimationMeta("顺序上滑", True, 0.500, "7510071484618935568", "7510071484618935568", "5446dd6cf75df9da1f3b5a64a4e66311")
     预览打字             = AnimationMeta("预览打字", True, 0.800, "7268589183583654401", "7268589183583654401", "1775531c318745d9497a8c28db541234")
+
+    # === VINH AUTO-IMPORTED TEXT INTROS ===
+    Rebound_In           = AnimationMeta("Rebound In", False, 0.500, "7232171569563308545", "7232171569563308545", "7a2b94056fe6c1cba19e27a986cdcb64", path="C:/Users/VINH/AppData/Local/CapCut/User Data/Cache/effect/7232171569563308545/7a2b94056fe6c1cba19e27a986cdcb64")
+    Flip_and_jump        = AnimationMeta("Flip and jump", False, 0.500, "6865175746420150792", "6865175746420150792", "4d9af68136aafd135073befdbfca7e39", path="C:/Users/VINH/AppData/Local/CapCut/User Data/Cache/effect/6865175746420150792/4d9af68136aafd135073befdbfca7e39")

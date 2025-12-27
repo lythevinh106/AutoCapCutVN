@@ -259,3 +259,14 @@ class IntroType(EffectEnum):
     黑白快刷             = AnimationMeta("黑白快刷", True, 0.500, "7524951415026896144", "7524951415026896144", "b9bab9715f2b523441ad16a9890e8e0a")
     黑白波纹             = AnimationMeta("黑白波纹", True, 2.000, "7517903514031410493", "7517903514031410493", "29c18b3e87acd3dbc0cb1823fe2ed368")
     黑边展开             = AnimationMeta("黑边展开", True, 2.000, "7519692247810477329", "7519692247810477329", "a204bcc795d4e61729f2a4f60b2c89ac")
+
+    # === VINH AUTO-IMPORTED VIDEO INTROS ===
+    Snapshots            = AnimationMeta("Snapshots", False, 1.400, "7412857043020681744", "7412857043020681744", "57a9fe13c9f196f76284c50eb8df5fe2", path="C:/Users/VINH/AppData/Local/CapCut/User Data/Cache/effect/7412857043020681744/57a9fe13c9f196f76284c50eb8df5fe2")
+
+    # === VINH AUTO-IMPORTED VIDEO INTROS ===
+    Neon_Love            = AnimationMeta("Neon Love", False, 1.970, "7583972868602711301", "7583972868602711301", "fdd1b067757574e88a924e2cdae1637e", path="C:/Users/VINH/AppData/Local/CapCut/User Data/Cache/effect/7583972868602711301/fdd1b067757574e88a924e2cdae1637e")
+
+    # === VINH AUTO-IMPORTED VIDEO INTROS ===
+    Rebound_In           = AnimationMeta("Rebound In", False, 0.500, "7232171569563308545", "7232171569563308545", "7a2b94056fe6c1cba19e27a986cdcb64", path="C:/Users/VINH/AppData/Local/CapCut/User Data/Cache/effect/7232171569563308545/7a2b94056fe6c1cba19e27a986cdcb64")
+    Golden_Dust          = AnimationMeta("Golden Dust", False, 0.500, "7331632775948145153", "7331632775948145153", "25d1da238cd78c05757f2d6036dec895", path="C:/Users/VINH/AppData/Local/CapCut/User Data/Cache/effect/7331632775948145153/25d1da238cd78c05757f2d6036dec895")
+    Flip_and_jump        = AnimationMeta("Flip and jump", False, 0.500, "6865175746420150792", "6865175746420150792", "4d9af68136aafd135073befdbfca7e39", path="C:/Users/VINH/AppData/Local/CapCut/User Data/Cache/effect/6865175746420150792/4d9af68136aafd135073befdbfca7e39")

@@ -2282,3 +2282,9 @@ class TransitionType(EffectEnum):
     """默认时长: 1.00s"""
     黑白闪现             = TransitionMeta("黑白闪现", True, "7248940490211463681", "7248940490211463681", "3922babba632da7545c9b507dff666a1", 0.600, True)
     """默认时长: 0.60s"""
+
+   
+    # === VINH AUTO-IMPORTED TRANSITIONS ===
+    Comparison_II        = TransitionMeta("Comparison II", False, "7299460949180682754", "7299460949180682754", "25835", 0.400, True, path="C:/Users/VINH/AppData/Local/CapCut/User Data/Cache/effect/7299460949180682754/64e8f4a060901fd4349301f97fbdd172", category_name="Trending", category_id="25835", source_platform=1, request_id="20251221120147B61F8986C103FDE60958")
+    Split_off_Cube       = TransitionMeta("Split-off Cube", False, "7537534640341404945", "7537534640341404945", "25835", 0.800, True, path="C:/Users/VINH/AppData/Local/CapCut/User Data/Cache/effect/7537534640341404945/b0c90b1fcf4c687a78716bc8794f525d", category_name="Trending", category_id="25835", source_platform=1, request_id="2025122023082228F758C7C0F028746E2F")
+    Gradual_Dissolve     = TransitionMeta("Gradual Dissolve", False, "7567289154564918533", "7567289154564918533", "25835", 0.533, True, path="C:/Users/VINH/AppData/Local/CapCut/User Data/Cache/effect/7567289154564918533/7ed4d14615773310a1b314d5d57f7a75", category_name="Trending", category_id="25835", source_platform=1, request_id="202512211234363E9271EA627ABDEA8C5C")

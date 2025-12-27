@@ -1003,3 +1003,17 @@ class FilterType(EffectEnum):
     黑豹                 = EffectMeta("黑豹", True, "7198431381368607234", "7198431381368607234", "7832398e5265f0e071594b8aed73dac0", [])
     黑金                 = EffectMeta("黑金", True, "7146475570623156738", "7146475570623156738", "9bd1add435ea65bdf3c51f5e8597952d", [])
     黑黄                 = EffectMeta("黑黄", True, "7226300464638202370", "7226300464638202370", "3b8072fd5557a0480151e937fa4c2c51", [])
+
+    # === VINH AUTO-IMPORTED FILTERS ===
+    _8K                  = EffectMeta("8K", False, "7480476382338813239", "7480476382338813239", "25516", [], path="C:/Users/VINH/AppData/Local/CapCut/User Data/Cache/effect/7480476382338813239/ccd56f031f17b773af5f03961641827a", category_name="Featured", category_id="25516", source_platform=1, request_id="202512201714007795EABEA01CA5AF4C4F")
+    Universal_Sunset     = EffectMeta("Universal Sunset", False, "7519721968254438657", "7519721968254438657", "25516", [], path="C:/Users/VINH/AppData/Local/CapCut/User Data/Cache/effect/7519721968254438657/0b4b43fb40421615fa7ef2c67da51c93", category_name="Featured", category_id="25516", source_platform=1, request_id="202512201714007795EABEA01CA5AF4C4F")
+
+    # === VINH AUTO-IMPORTED FILTERS ===
+    Elegant_B_W          = EffectMeta("Elegant B&W", False, "7394399556227568129", "7394399556227568129", "25516", [], path="C:/Users/VINH/AppData/Local/CapCut/User Data/Cache/effect/7394399556227568129/c35e784804029d3cbae7cec81cc72f56", category_name="Featured", category_id="25516", source_platform=1, request_id="202512211140568054D8D7D17022E872F3")
+    Fresh_Lime           = EffectMeta("Fresh Lime", False, "7544864273009331457", "7544864273009331457", "25516", [], path="C:/Users/VINH/AppData/Local/CapCut/User Data/Cache/effect/7544864273009331457/0c69a2c97b22ebcadb813a34e59c30cc", category_name="Featured", category_id="25516", source_platform=1, request_id="202512201714007795EABEA01CA5AF4C4F")
+
+    # === VINH AUTO-IMPORTED FILTERS ===
+    Flirtation           = EffectMeta("Flirtation", False, "7268607066887950849", "7268607066887950849", "25516", [], path="C:/Users/VINH/AppData/Local/CapCut/User Data/Cache/effect/7268607066887950849/f325dcefb566f8eff99bafb2fc7925a9", category_name="Featured", category_id="25516", source_platform=1, request_id="202512201714007795EABEA01CA5AF4C4F")
+
+    # === VINH AUTO-IMPORTED FILTERS ===
+    Spring_Chorus        = EffectMeta("Spring Chorus", False, "6944899227596100098", "6944899227596100098", "25516", [], path="C:/Users/VINH/AppData/Local/CapCut/User Data/Cache/effect/6944899227596100098/d6a901da9f20e52d58fcb02912752ca9", category_name="Featured", category_id="25516", source_platform=1, request_id="202512201714007795EABEA01CA5AF4C4F")

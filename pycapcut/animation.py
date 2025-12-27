@@ -30,6 +30,16 @@ class Animation:
 
     is_video_animation: bool
     """是否为视频动画, 在子类中定义"""
+    
+    # === NEW FIELDS for text loop animations ===
+    path: str
+    """Animation file path (required for text loop to work)"""
+    category_id: str
+    """Category ID (e.g., 'xunhuan' for loop)"""
+    category_name: str
+    """Category name (e.g., 'Loop')"""
+    source_platform: int
+    """Platform source (1 = CapCut server)"""
 
     def __init__(self, animation_meta: AnimationMeta, start: int, duration: int):
         self.name = animation_meta.title
@@ -38,6 +48,12 @@ class Animation:
 
         self.start = start
         self.duration = duration
+        
+        # New fields from AnimationMeta
+        self.path = getattr(animation_meta, 'path', '')
+        self.category_id = getattr(animation_meta, 'category_id', 'xunhuan')
+        self.category_name = getattr(animation_meta, 'category_name', 'Loop')
+        self.source_platform = getattr(animation_meta, 'source_platform', 1)
 
     def export_json(self) -> Dict[str, Any]:
         return {
@@ -53,7 +69,13 @@ class Animation:
 
             "start": self.start,
             "duration": self.duration,
-            # 不导出path和request_id
+            
+            # === NEW FIELDS for CapCut compatibility ===
+            "path": self.path,
+            "category_id": self.category_id,
+            "category_name": self.category_name,
+            "source_platform": self.source_platform,
+            "third_resource_id": "0",
         }
 
 class VideoAnimation(Animation):

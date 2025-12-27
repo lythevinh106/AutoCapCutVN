@@ -357,3 +357,16 @@ class FontType(EffectEnum):
     ZY_Wonder            = EffectMeta("ZY Wonder", True, "7270788266683535932", "7270788266683535932", "dbfdbb77a913235dac580fc6e9e4c19c", [])
     gildan_Italic        = EffectMeta("gildan-Italic", True, "7442588993956352513", "7442588993956352513", "2d59c5411a396be79a972abb62bcef23", [])
     intellecta_typewriter = EffectMeta("intellecta-typewriter", True, "7450055792297775632", "7450055792297775632", "5b11cd0b57d0571375167a605e4b5c0e", [])
+
+  
+
+
+    # === VINH AUTO-IMPORTED FONTS ===
+    EaRe_Md              = EffectMeta("EaRe-Md", False, "7535354087219514641", "7535354087219514641", "", [])
+    Malee                = EffectMeta("Malee", False, "7546114825626160385", "7546114825626160385", "", [])
+    Noto_Serif           = EffectMeta("Noto Serif", False, "7479033695383457079", "7479033695383457079", "", [])
+    Kwarng               = EffectMeta("Kwarng", False, "7546084256091589905", "7546084256091589905", "", [])
+    特黑体_思源黑体1号           = EffectMeta("特黑体-思源黑体1号", False, "6740439840254333443", "6740439840254333443", "", [])
+
+    # === VINH AUTO-IMPORTED FONTS ===
+    en                   = EffectMeta("en", False, "", "", "", [])

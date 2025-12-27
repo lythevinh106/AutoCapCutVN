@@ -61,17 +61,56 @@ class EffectMeta:
     effect_id: str
     """效果ID"""
     md5: str
+    """MD5 hash hoặc category_id (để backward compatible)"""
 
     params: List[EffectParam]
     """效果的参数信息"""
 
-    def __init__(self, name: str, is_vip: bool, resource_id: str, effect_id: str, md5: str, params: List[EffectParam] = []):
+    # === NEW FIELDS for effect to work properly ===
+    path: str
+    """Đường dẫn đến file effect đã cache trong CapCut (BẮT BUỘC để effect hoạt động)"""
+    category_name: str
+    """Tên category của effect"""
+    category_id: str
+    """ID category của effect"""
+    source_platform: int
+    """Platform source (1 = from CapCut server)"""
+    request_id: str
+    """Request ID khi download effect"""
+
+    def __init__(self, name: str, is_vip: bool, resource_id: str, effect_id: str, md5: str, 
+                 params: List[EffectParam] = [], *,
+                 path: str = "", category_name: str = "", category_id: str = "",
+                 source_platform: int = 0, request_id: str = ""):
+        """
+        Khởi tạo EffectMeta.
+        
+        Args:
+            name: Tên effect
+            is_vip: Có phải VIP không
+            resource_id: Resource ID
+            effect_id: Effect ID  
+            md5: MD5 hash (hoặc category_id cho backward compat)
+            params: Danh sách tham số
+            path: Đường dẫn file effect đã cache (keyword-only)
+            category_name: Tên category (keyword-only)
+            category_id: ID category (keyword-only)
+            source_platform: Platform (keyword-only)
+            request_id: Request ID (keyword-only)
+        """
         self.name = name
         self.is_vip = is_vip
         self.resource_id = resource_id
         self.effect_id = effect_id
         self.md5 = md5
         self.params = params
+        
+        # New fields
+        self.path = path
+        self.category_name = category_name
+        self.category_id = category_id if category_id else md5  # Fallback to md5 for backward compat
+        self.source_platform = source_platform
+        self.request_id = request_id
 
     def parse_params(self, params: Optional[List[Optional[float]]]) -> List[EffectParamInstance]:
         """解析参数列表(范围0~100), 返回参数实例列表"""
@@ -123,14 +162,31 @@ class AnimationMeta:
     resource_id: str
     effect_id: str
     md5: str
+    
+    # === NEW FIELDS for text loop animations to work in CapCut ===
+    path: str
+    """Đường dẫn file animation đã cache (BẮT BUỘC cho text loop hoạt động)"""
+    category_id: str
+    """Category ID (e.g., 'xunhuan' for loop)"""
+    category_name: str
+    """Category name (e.g., 'Loop')"""
+    source_platform: int
+    """Platform source (1 = CapCut server)"""
 
-    def __init__(self, title: str, is_vip: bool, duration: float, resource_id: str, effect_id: str, md5: str):
+    def __init__(self, title: str, is_vip: bool, duration: float, resource_id: str, effect_id: str, md5: str, *,
+                 path: str = "", category_id: str = "xunhuan", category_name: str = "Loop", source_platform: int = 1):
         self.title = title
         self.is_vip = is_vip
         self.duration = int(round(duration * 1e6))
         self.resource_id = resource_id
         self.effect_id = effect_id
         self.md5 = md5
+        
+        # New fields for CapCut compatibility
+        self.path = path
+        self.category_id = category_id
+        self.category_name = category_name
+        self.source_platform = source_platform
 
 # 蒙版元数据
 class MaskMeta:
@@ -179,8 +235,23 @@ class TransitionMeta:
     """默认持续时间, 单位为微秒"""
     is_overlap: bool
     """是否允许重叠(?)"""
+    
+    # === NEW FIELDS for proper CapCut rendering ===
+    path: str
+    """Đường dẫn file transition đã cache"""
+    category_name: str
+    """Tên category"""
+    category_id: str
+    """ID category"""
+    source_platform: int
+    """Platform source (1 = CapCut)"""
+    request_id: str
+    """Request ID"""
 
-    def __init__(self, name: str, is_vip: bool, resource_id: str, effect_id: str, md5: str, default_duration: float, is_overlap: bool):
+    def __init__(self, name: str, is_vip: bool, resource_id: str, effect_id: str, md5: str, 
+                 default_duration: float, is_overlap: bool, *,
+                 path: str = "", category_name: str = "", category_id: str = "",
+                 source_platform: int = 0, request_id: str = ""):
         self.name = name
         self.is_vip = is_vip
         self.resource_id = resource_id
@@ -189,3 +260,10 @@ class TransitionMeta:
 
         self.default_duration = int(round(default_duration * 1e6))
         self.is_overlap = is_overlap
+        
+        # New fields
+        self.path = path
+        self.category_name = category_name
+        self.category_id = category_id
+        self.source_platform = source_platform
+        self.request_id = request_id

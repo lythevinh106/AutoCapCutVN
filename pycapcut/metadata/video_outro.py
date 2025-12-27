@@ -227,3 +227,11 @@ class OutroType(EffectEnum):
     魔法粒子II           = AnimationMeta("魔法粒子II", True, 3.000, "7446716461738889745", "7446716461738889745", "ff56bdebbd3863db982d845635b3c42e")
     黑洞                 = AnimationMeta("黑洞", True, 0.733, "7294461821170225666", "7294461821170225666", "18f0daae1bf0b7bb2fbdec2d4a3dbdcd")
     黑边展开             = AnimationMeta("黑边展开", True, 2.000, "7517506192269233425", "7517506192269233425", "2da110ec358a353b9cd32c1cefe5a5f2")
+
+    # === VINH AUTO-IMPORTED VIDEO OUTROS ===
+    Snowflake_Veil       = AnimationMeta("Snowflake Veil", False, 1.750, "7446316654000083457", "7446316654000083457", "11b7e97fceba9cf1d7babfe764d1bdcb", path="C:/Users/VINH/AppData/Local/CapCut/User Data/Cache/effect/7446316654000083457/11b7e97fceba9cf1d7babfe764d1bdcb")
+
+    # === VINH AUTO-IMPORTED VIDEO OUTROS ===
+    Gradual_Drop         = AnimationMeta("Gradual Drop", False, 0.500, "7509022932040043793", "7509022932040043793", "93b69a10c65be7a457d1cd4926a6d708", path="C:/Users/VINH/AppData/Local/CapCut/User Data/Cache/effect/7509022932040043793/93b69a10c65be7a457d1cd4926a6d708")
+    Bright_Dissolution   = AnimationMeta("Bright Dissolution", False, 0.500, "7522191306219638033", "7522191306219638033", "cad904b8219454c2be71a5608eef4acb", path="C:/Users/VINH/AppData/Local/CapCut/User Data/Cache/effect/7522191306219638033/cad904b8219454c2be71a5608eef4acb")
+    Chromatic_Aberration_Tailing = AnimationMeta("Chromatic Aberration Tailing", False, 0.500, "7161314207609131522", "7161314207609131522", "998e6b4aee4a58c7810ae427f4ef2a6e", path="C:/Users/VINH/AppData/Local/CapCut/User Data/Cache/effect/7161314207609131522/998e6b4aee4a58c7810ae427f4ef2a6e")
