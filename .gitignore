@@ -14,3 +14,9 @@ venv/
 
 tools/
 ignored/
+test/
+
+# Temp files
+temp_*.json
+debug_output.txt
+*.log
