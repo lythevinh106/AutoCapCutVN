@@ -109,7 +109,10 @@ class TextOutro(EffectEnum):
     顺序下滑             = AnimationMeta("顺序下滑", True, 0.500, "7511931646191340817", "7511931646191340817", "1c4c14e9aba590051adeefb4cabd215a")
     预览打字             = AnimationMeta("预览打字", True, 0.800, "7268589338567381506", "7268589338567381506", "360d883bb43dab551defd1e94b9730d6")
 
+
     # === VINH AUTO-IMPORTED TEXT OUTROS ===
-    Gradual_Drop         = AnimationMeta("Gradual Drop", False, 0.500, "7509022932040043793", "7509022932040043793", "93b69a10c65be7a457d1cd4926a6d708", path="C:/Users/VINH/AppData/Local/CapCut/User Data/Cache/effect/7509022932040043793/93b69a10c65be7a457d1cd4926a6d708")
-    Bright_Dissolution   = AnimationMeta("Bright Dissolution", False, 0.500, "7522191306219638033", "7522191306219638033", "cad904b8219454c2be71a5608eef4acb", path="C:/Users/VINH/AppData/Local/CapCut/User Data/Cache/effect/7522191306219638033/cad904b8219454c2be71a5608eef4acb")
-    Chromatic_Aberration_Tailing = AnimationMeta("Chromatic Aberration Tailing", False, 0.500, "7161314207609131522", "7161314207609131522", "998e6b4aee4a58c7810ae427f4ef2a6e", path="C:/Users/VINH/AppData/Local/CapCut/User Data/Cache/effect/7161314207609131522/998e6b4aee4a58c7810ae427f4ef2a6e")
+
+    # === VINH AUTO-IMPORTED TEXT OUTROS ===
+    # === VINH AUTO-IMPORTED TEXT OUTROS ===
+    Flea_Jumping         = AnimationMeta("Flea Jumping", False, 0.500, "7571627405484248337", "7571627405484248337", "a968388a94d5f7b8189538b69d51f2fe")
+    Flash_Scatter        = AnimationMeta("Flash Scatter", False, 0.500, "7268174468311159298", "7268174468311159298", "81f6bb512776146b5d096043d35163df")

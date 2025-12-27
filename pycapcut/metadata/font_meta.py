@@ -370,3 +370,8 @@ class FontType(EffectEnum):
 
     # === VINH AUTO-IMPORTED FONTS ===
     en                   = EffectMeta("en", False, "", "", "", [])
+
+    # === VINH AUTO-IMPORTED FONTS ===
+    font                 = EffectMeta("font", False, "7550234537641446657", "7550234537641446657", "", [])
+    Sriracha_Rg          = EffectMeta("Sriracha-Rg", False, "7550234537641446657", "7550234537641446657", "", [])
+    Thasadith_Bd         = EffectMeta("Thasadith-Bd", False, "7550220815149649153", "7550220815149649153", "", [])

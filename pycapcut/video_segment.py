@@ -568,26 +568,104 @@ class StickerSegment(VisualSegment):
 
     resource_id: str
     """贴纸资源id"""
+    
+    # === METADATA FIELDS ===
+    name: str
+    sticker_id: str
+    path: str
+    category_id: str
+    category_name: str
+    source_platform: int
+    request_id: str
+    md5: str
 
-    def __init__(self, resource_id: str, target_timerange: Timerange, *, clip_settings: Optional[ClipSettings] = None):
-        """根据贴纸resource_id构建一个贴纸片段, 并指定其时间信息及图像调节设置
+    def __init__(self, sticker_meta, target_timerange: Timerange, *, clip_settings: Optional[ClipSettings] = None):
+        """根据贴纸EffectMeta或resource_id构建一个贴纸片段, 并指定其时间信息及图像调节设置
 
         片段创建完成后, 可通过`ScriptFile.add_segment`方法将其添加到轨道中
 
         Args:
-            resource_id (`str`): 贴纸resource_id, 可通过`ScriptFile.inspect_material`从模板中获取
+            sticker_meta: EffectMeta object or resource_id string
             target_timerange (`Timerange`): 片段在轨道上的目标时间范围
             clip_settings (`ClipSettings`, optional): 图像调节设置, 默认不作任何变换
         """
         super().__init__(uuid.uuid4().hex, None, target_timerange, 1.0, 1.0, clip_settings=clip_settings)
-        self.resource_id = resource_id
+        
+        # Check if sticker_meta is EffectMeta or just a string resource_id
+        if hasattr(sticker_meta, 'resource_id'):
+            # It's an EffectMeta object
+            self.resource_id = sticker_meta.resource_id
+            self.name = sticker_meta.name
+            self.sticker_id = sticker_meta.resource_id
+            self.path = getattr(sticker_meta, 'path', '') or ''
+            self.category_id = getattr(sticker_meta, 'category_id', '') or ''
+            self.category_name = getattr(sticker_meta, 'category_name', '') or ''
+            self.source_platform = getattr(sticker_meta, 'source_platform', 1) or 1
+            self.request_id = getattr(sticker_meta, 'request_id', '') or ''
+            self.md5 = getattr(sticker_meta, 'md5', '') or ''
+        else:
+            # It's a string resource_id (backwards compatibility)
+            self.resource_id = str(sticker_meta)
+            self.name = ""
+            self.sticker_id = str(sticker_meta)
+            self.path = ""
+            self.category_id = ""
+            self.category_name = ""
+            self.source_platform = 1
+            self.request_id = ""
+            self.md5 = ""
 
     def export_material(self) -> Dict[str, Any]:
-        """创建极简的贴纸素材对象, 以此不再单独定义贴纸素材类"""
+        """创建完整的贴纸素材对象, 包含CapCut需要的所有字段"""
         return {
+            "aigc_type": "none",
+            "background_alpha": 1.0,
+            "background_color": "",
+            "border_color": "",
+            "border_line_style": 0,
+            "border_width": 0.0,
+            "category_id": self.category_id,
+            "category_name": self.category_name,
+            "check_flag": 1,
+            "combo_info": {"text_templates": []},
+            "cycle_setting": True,
+            "formula_id": "",
+            "global_alpha": 1.0,
+            "has_shadow": False,
+            "icon_url": "",
             "id": self.material_id,
+            "multi_language_current": "none",
+            "name": self.name,
+            "original_size": [],
+            "path": self.path,
+            "platform": "all",
+            "preview_cover_url": "",
+            "radius": {"bottom_left": 0.0, "bottom_right": 0.0, "top_left": 0.0, "top_right": 0.0},
+            "request_id": self.request_id,
             "resource_id": self.resource_id,
-            "sticker_id": self.resource_id,
-            "source_platform": 1,
+            "sequence_type": False,
+            "shadow_alpha": 0.8,
+            "shadow_angle": 0.0,
+            "shadow_color": "",
+            "shadow_distance": 0.0,
+            "shadow_point": {"x": 0.0, "y": 0.0},
+            "shadow_smoothing": 0.0,
+            "shape_fill_render_style": {
+                "alpha": 1.0,
+                "color": {
+                    "gradient": {"alpha": [], "angle": 90.0, "color": [], "mode": "all", "percent": [], "style": "linear"},
+                    "render_type": "solid",
+                    "solid": {"alpha": 1.0, "color": "#FFFFFF"},
+                    "texture": {"alpha": 1.0, "angle": 90.0, "blend": "no", "effect_id": "", "fill": "tile", "flip": [], "path": "", "range": 4, "resource_id": "", "scale": 1.0}
+                }
+            },
+            "shape_fill_use_flower_color": False,
+            "shape_param": {"custom_points": [], "roundness": [], "shape_size": [], "shape_type": 0},
+            "source_platform": self.source_platform,
+            "sticker_id": self.sticker_id,
+            "sub_type": 0,
+            "team_id": "",
             "type": "sticker",
+            "unicode": ""
         }
+

@@ -1,0 +1,157 @@
+{
+    "canvas_config": {
+        "width": 1080,
+        "height": 1920,
+        "fps": 30
+    },
+    "video_sequence": [
+        {
+            "source": "C:/Users/VINH/Pictures/Store veo3/__description_202508132224.mp4",
+            "duration_ms": 5000,
+            "volume": 0.3,
+            "intro_animation": {
+                "type": "渐显",
+                "duration_ms": 500
+            },
+            "transition_to_next": {
+                "type": "Comparison_II",
+                "duration_ms": 400
+            },
+            "background_fill": {
+                "type": "blur",
+                "intensity": 0.375
+            }
+        },
+        {
+            "source": "C:/Users/VINH/Pictures/Store veo3/__description_202508132227.mp4",
+            "duration_ms": 5000,
+            "volume": 0.3,
+            "intro_animation": {
+                "type": "渐显",
+                "duration_ms": 400
+            },
+            "transition_to_next": {
+                "type": "Split_off_Cube",
+                "duration_ms": 800
+            },
+            "background_fill": {
+                "type": "blur",
+                "intensity": 0.375
+            }
+        },
+        {
+            "source": "C:/Users/VINH/Pictures/Store veo3/__description_202508101516.mp4",
+            "duration_ms": 5000,
+            "volume": 0.3,
+            "intro_animation": {
+                "type": "渐显",
+                "duration_ms": 400
+            },
+            "transition_to_next": {
+                "type": "Gradual_Dissolve",
+                "duration_ms": 533
+            },
+            "background_fill": {
+                "type": "blur",
+                "intensity": 0.375
+            }
+        },
+        {
+            "source": "C:/Users/VINH/Pictures/Store veo3/__description_202508132214.mp4",
+            "duration_ms": 5000,
+            "volume": 0.3,
+            "intro_animation": {
+                "type": "渐显",
+                "duration_ms": 400
+            },
+            "transition_to_next": {
+                "type": "Comparison_II",
+                "duration_ms": 400
+            },
+            "background_fill": {
+                "type": "blur",
+                "intensity": 0.375
+            }
+        },
+        {
+            "source": "C:/Users/VINH/Pictures/Store veo3/__description_202508101436.mp4",
+            "duration_ms": 5000,
+            "volume": 0.3,
+            "intro_animation": {
+                "type": "渐显",
+                "duration_ms": 400
+            },
+            "transition_to_next": {
+                "type": "Gradual_Dissolve",
+                "duration_ms": 400
+            },
+            "background_fill": {
+                "type": "blur",
+                "intensity": 0.375
+            }
+        },
+        {
+            "source": "C:/Users/VINH/Pictures/Store veo3/__description_202508132224.mp4",
+            "duration_ms": 5000,
+            "volume": 0.3,
+            "intro_animation": {
+                "type": "渐显",
+                "duration_ms": 400
+            },
+            "outro_animation": {
+                "type": "渐隐",
+                "duration_ms": 500
+            },
+            "background_fill": {
+                "type": "blur",
+                "intensity": 0.375
+            }
+        }
+    ],
+    "audios": [
+        {
+            "source": "C:/Users/VINH/Music/SunoDownloads/운명의 서곡-20251026_162104.mp3",
+            "volume": 0.5,
+            "fade_in_ms": 2000,
+            "fade_out_ms": 3000
+        }
+    ],
+    "effects": [
+        {
+            "type": "电光眼",
+            "category": "character",
+            "start_ms": 0,
+            "duration_ms": 5000
+        },
+        {
+            "type": "霓虹渐变",
+            "category": "character",
+            "start_ms": 5000,
+            "duration_ms": 5000
+        },
+        {
+            "type": "Sonic_Ripple",
+            "category": "scene",
+            "start_ms": 10000,
+            "duration_ms": 5000
+        },
+        {
+            "type": "渐显开幕",
+            "category": "scene",
+            "start_ms": 15000,
+            "duration_ms": 5000
+        },
+        {
+            "type": "Holoscan",
+            "category": "scene",
+            "start_ms": 20000,
+            "duration_ms": 5000
+        },
+        {
+            "type": "Diva_Winter",
+            "category": "scene",
+            "start_ms": 25000,
+            "duration_ms": 5000
+        }
+    ]
+}

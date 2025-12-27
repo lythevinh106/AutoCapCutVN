@@ -653,6 +653,55 @@ def create_amv_project_video():
         processing_results["texts"]["count"] = texts_count
         processing_results["texts"]["status"] = "completed" if texts_count > 0 else "skipped (no texts)"
         
+        # --- 4.7 STICKERS (Optional) ---
+        from pycapcut.metadata.sticker_meta import StickerType
+        
+        stickers_count = len(edit_request.stickers)
+        processing_results["stickers"] = {"count": 0, "status": "pending"}
+        
+        # Add sticker track
+        try:
+            script.add_track(cc.TrackType.sticker, track_name="sticker_track")
+        except:
+            pass
+        
+        for idx, sticker_item in enumerate(edit_request.stickers):
+            try:
+                # Get sticker metadata from StickerType
+                sticker_meta = getattr(StickerType, sticker_item.type, None)
+                if not sticker_meta:
+                    processing_results["stickers"]["status"] = f"Sticker type '{sticker_item.type}' not found"
+                    continue
+                
+                # Get position
+                pos = sticker_item.position
+                transform_x = pos.x if pos else 0
+                transform_y = pos.y if pos else 0
+                
+                # Create clip settings with scale
+                clip_settings = cc.ClipSettings(
+                    transform_x=transform_x,
+                    transform_y=transform_y,
+                    scale_x=sticker_item.scale,
+                    scale_y=sticker_item.scale
+                )
+                
+                # Create sticker segment - pass full EffectMeta for complete metadata export
+                sticker_seg = cc.StickerSegment(
+                    sticker_meta.value,  # Pass EffectMeta object, not just resource_id
+                    trange(sticker_item.start_ms * 1000, sticker_item.duration_ms * 1000),
+                    clip_settings=clip_settings
+                )
+                
+                # Add to sticker track
+                script.add_segment(sticker_seg, track_name="sticker_track")
+                
+            except Exception as se:
+                processing_results["stickers"]["status"] = f"Error on sticker {idx}: {str(se)}"
+        
+        processing_results["stickers"]["count"] = stickers_count
+        processing_results["stickers"]["status"] = "completed" if stickers_count > 0 else "skipped (no stickers)"
+        
         # ===== 5. SAVE DRAFT =====
         script.save()
         

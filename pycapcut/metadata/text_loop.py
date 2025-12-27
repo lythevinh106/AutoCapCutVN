@@ -90,25 +90,13 @@ class TextLoopAnim(EffectEnum):
     魔幻晃动             = AnimationMeta("魔幻晃动", True, 0.500, "7527869868398365968", "7527869868398365968", "75623a6ba64fa231261b26c11e5beacd")
     鱼眼漂浮             = AnimationMeta("鱼眼漂浮", True, 0.500, "7516777515143171345", "7516777515143171345", "056040061317c08621684bd99b4a4669")
 
+
+
     # === VINH AUTO-IMPORTED TEXT LOOPS ===
-   
-    
-    Heartbeat            = AnimationMeta("Heartbeat", False, 0.367, "7217700961383354882", "7217700961383354882", "3c2c6a7f6b8b102e9ae5f918600f83c0")
-    Shine                = AnimationMeta("Shine", False, 0.500, "7170917392980120065", "7170917392980120065", "810cca793722d3736730aadf62d77301")
-    Wave_3               = AnimationMeta("Wave 3", False, 0.500, "7080126475633955329", "7080126475633955329", "47c2db2f5ad8ba96cfb5f1279c019464")
     Flare                = AnimationMeta("Flare", False, 0.500, "7128311749186425346", "7128311749186425346", "494af236e19eefc9895a4cc2b8d20736")
 
+    # === VINH AUTO-IMPORTED TEXT LOOPS ===
+    Steady_Pulse         = AnimationMeta("Steady Pulse", False, 0.500, "7584639098942475521", "7584639098942475521", "8bffea084f646ed25a23ad4a2259dcb1")
 
     # === VINH AUTO-IMPORTED TEXT LOOPS ===
-    Wavy_Flame           = AnimationMeta("Wavy Flame", False, 0.367, "7566545500510375184", "7566545500510375184", "6ebecb57a35421e5f57edd788226ede3", path="C:/Users/VINH/AppData/Local/CapCut/User Data/Cache/effect/7566545500510375184/6ebecb57a35421e5f57edd788226ede3")
-    Warning_Zone         = AnimationMeta("Warning Zone", False, 0.367, "7540930212133997825", "7540930212133997825", "cca268161f1d50e35e3cc9bbae5a6a2b", path="C:/Users/VINH/AppData/Local/CapCut/User Data/Cache/effect/7540930212133997825/cca268161f1d50e35e3cc9bbae5a6a2b")
-    Agitated             = AnimationMeta("Agitated", False, 0.367, "7545744209223879952", "7545744209223879952", "1d18b4e0fffab97a18ee539a673106f2", path="C:/Users/VINH/AppData/Local/CapCut/User Data/Cache/effect/7545744209223879952/1d18b4e0fffab97a18ee539a673106f2")
-    Neon_Reflection      = AnimationMeta("Neon Reflection", False, 0.367, "7577565741377981713", "7577565741377981713", "87ed6dc42e7404e5ca01361fbdc0a1db", path="C:/Users/VINH/AppData/Local/CapCut/User Data/Cache/effect/7577565741377981713/87ed6dc42e7404e5ca01361fbdc0a1db")
-    Stage_Laser          = AnimationMeta("Stage Laser", False, 0.367, "7532794715645775120", "7532794715645775120", "9e4a0d41909bbf43cf5b20d25a3a37ca", path="C:/Users/VINH/AppData/Local/CapCut/User Data/Cache/effect/7532794715645775120/9e4a0d41909bbf43cf5b20d25a3a37ca")
-    Gold_Rush            = AnimationMeta("Gold Rush", False, 0.367, "7545742294297660673", "7545742294297660673", "2646a21f26faeb4103acacaa74c171f6", path="C:/Users/VINH/AppData/Local/CapCut/User Data/Cache/effect/7545742294297660673/2646a21f26faeb4103acacaa74c171f6")
-    Star_Gates           = AnimationMeta("Star Gates", False, 0.367, "7537612107882286353", "7537612107882286353", "3a4ca97a3ae1f921fd6a6543b8198a56", path="C:/Users/VINH/AppData/Local/CapCut/User Data/Cache/effect/7537612107882286353/3a4ca97a3ae1f921fd6a6543b8198a56")
-
-    # === VINH AUTO-IMPORTED TEXT LOOPS ===
-    Tremble              = AnimationMeta("Tremble", False, 0.250, "6790246693674684942", "6790246693674684942", "383dabd75d7fe7985d990ebb34d63732", path="C:/Users/VINH/AppData/Local/CapCut/User Data/Cache/effect/6790246693674684942/383dabd75d7fe7985d990ebb34d63732")
-    Endless_Panic        = AnimationMeta("Endless Panic", False, 0.250, "7573602635404659969", "7573602635404659969", "c7f0d706b71e9e4924e5158fe7411022", path="C:/Users/VINH/AppData/Local/CapCut/User Data/Cache/effect/7573602635404659969/c7f0d706b71e9e4924e5158fe7411022")
-    Neon_Throbs          = AnimationMeta("Neon Throbs", False, 0.250, "7571022495776623889", "7571022495776623889", "2a69a7d66df6d53d8c2620374eeb9d3a", path="C:/Users/VINH/AppData/Local/CapCut/User Data/Cache/effect/7571022495776623889/2a69a7d66df6d53d8c2620374eeb9d3a")
+    Burning_Fuzz         = AnimationMeta("Burning Fuzz", False, 0.500, "7584752701779561744", "7584752701779561744", "77b1e612be96b3e0d312c2dafb4e7b64")

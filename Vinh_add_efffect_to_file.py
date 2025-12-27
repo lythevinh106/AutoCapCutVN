@@ -22,6 +22,7 @@ DRAFT_NAME = "effect_library"  # Tên project trong CapCut
 # Đường dẫn các file metadata
 METADATA_DIR = os.path.join(os.path.dirname(__file__), "pycapcut", "metadata")
 EFFECT_FILE = os.path.join(METADATA_DIR, "video_scene_effect.py")
+CHARACTER_EFFECT_FILE = os.path.join(METADATA_DIR, "video_character_effect.py")  # Face effects
 FILTER_FILE = os.path.join(METADATA_DIR, "filter_meta.py")
 AUDIO_EFFECT_FILE = os.path.join(METADATA_DIR, "audio_scene_effect.py")
 TRANSITION_FILE = os.path.join(METADATA_DIR, "transition_meta.py")
@@ -32,6 +33,7 @@ TEXT_OUTRO_FILE = os.path.join(METADATA_DIR, "text_outro.py")
 VIDEO_INTRO_FILE = os.path.join(METADATA_DIR, "video_intro.py")
 VIDEO_OUTRO_FILE = os.path.join(METADATA_DIR, "video_outro.py")
 COMBO_ANIM_FILE = os.path.join(METADATA_DIR, "combo_animation.py")
+STICKER_FILE = os.path.join(METADATA_DIR, "sticker_meta.py")
 
 
 # ============ HELPER FUNCTIONS ============
@@ -65,23 +67,34 @@ def get_existing_names(file_path: str) -> set:
 
 
 def generate_effect_code(item: dict) -> str:
-    """Generate code cho EffectMeta (effects, filters, audio effects)"""
+    """Generate code cho EffectMeta (effects, filters, audio effects)
+    
+    NOTE: Không thêm path vì path là local path của user, không portable.
+    Cần trích xuất md5 từ path hoặc file_md5 field.
+    """
     name = item.get('name', 'Unknown')
     effect_id = item.get('effect_id', '')
     resource_id = item.get('resource_id', '')
     category_id = item.get('category_id', '')
     category_name = item.get('category_name', '')
-    path = item.get('path', '').replace('\\', '/')
     source_platform = item.get('source_platform', 0)
     request_id = item.get('request_id', '')
+    
+    # Extract MD5 from file_md5 or from path
+    # Path format: C:/Users/.../Cache/effect/resource_id/md5_hash
+    md5 = item.get('file_md5', '')
+    if not md5:
+        path = item.get('path', '').replace('\\', '/')
+        if path:
+            path_parts = path.rstrip('/').split('/')
+            if len(path_parts) >= 1 and len(path_parts[-1]) == 32:
+                md5 = path_parts[-1]
     
     var_name = sanitize_effect_name(name)
     padded_var = f"{var_name:<20}"
     
-    # Build kwargs
+    # Build kwargs - NO PATH (không thêm path)
     kwargs = []
-    if path:
-        kwargs.append(f'path="{path}"')
     if category_name:
         kwargs.append(f'category_name="{category_name}"')
     if category_id:
@@ -91,11 +104,13 @@ def generate_effect_code(item: dict) -> str:
     if request_id:
         kwargs.append(f'request_id="{request_id}"')
     
-    code = f'    {padded_var} = EffectMeta("{name}", False, "{resource_id}", "{effect_id}", "{category_id}", []'
+    # MD5 is required for effects to work - use it as 5th positional arg
+    code = f'    {padded_var} = EffectMeta("{name}", False, "{resource_id}", "{effect_id}", "{md5}", []'
     if kwargs:
         code += ', ' + ', '.join(kwargs)
     code += ')'
     return code
+
 
 
 def generate_font_code(item: dict) -> str:
@@ -113,22 +128,21 @@ def generate_font_code(item: dict) -> str:
 
 
 def generate_text_loop_code(item: dict) -> str:
-    """Generate code cho TextLoopAnim (text loop animations)"""
+    """Generate code cho TextLoopAnim (text loop animations)
+    
+    NOTE: Không thêm path vì path là local path của user
+    """
     name = item.get('name', 'Unknown')
     resource_id = item.get('resource_id', '')
     effect_id = item.get('effect_id', resource_id)
     
-    # Get path - CRITICAL for animation to work in CapCut
-    path = item.get('path', '').replace('\\', '/')
-    
-    # Try to get MD5 from different sources:
-    # 1. file_md5 field directly
-    # 2. Extract from path (format: .../resource_id/md5_hash)
+    # Try to get MD5 from different sources
     md5 = item.get('file_md5', '')
     if not md5:
+        # Extract from path if available
+        path = item.get('path', '').replace('\\', '/')
         if path:
-            # Path format: C:/Users/.../Cache/effect/resource_id/md5_hash
-            path_parts = path.replace('\\', '/').rstrip('/').split('/')
+            path_parts = path.rstrip('/').split('/')
             if len(path_parts) >= 1 and len(path_parts[-1]) == 32:
                 md5 = path_parts[-1]
     
@@ -139,28 +153,25 @@ def generate_text_loop_code(item: dict) -> str:
     var_name = sanitize_effect_name(name)
     padded_var = f"{var_name:<20}"
     
-    # Generate code WITH path for CapCut compatibility
-    # Format: AnimationMeta(title, is_vip, duration, resource_id, effect_id, md5, *, path=...)
-    if path:
-        code = f'    {padded_var} = AnimationMeta("{name}", False, {duration_sec:.3f}, "{resource_id}", "{effect_id}", "{md5}", path="{path}")'
-    else:
-        code = f'    {padded_var} = AnimationMeta("{name}", False, {duration_sec:.3f}, "{resource_id}", "{effect_id}", "{md5}")'
+    # Generate code WITHOUT path (không thêm path)
+    code = f'    {padded_var} = AnimationMeta("{name}", False, {duration_sec:.3f}, "{resource_id}", "{effect_id}", "{md5}")'
     return code
 
 
 def generate_text_anim_code(item: dict) -> str:
-    """Generate code cho Text Intro/Outro animations (type='in'/'out' for text elements)"""
+    """Generate code cho Text Intro/Outro animations (type='in'/'out' for text elements)
+    
+    NOTE: Không thêm path vì path là local path của user
+    """
     name = item.get('name', 'Unknown')
     resource_id = item.get('resource_id', '')
     effect_id = item.get('effect_id', '') or resource_id
     
-    # Get path - CRITICAL for animation to work in CapCut
-    path = item.get('path', '').replace('\\', '/')
-    
     # Try to get MD5 from different sources
     md5 = item.get('file_md5', '')
+    path = item.get('path', '').replace('\\', '/')
     if not md5 and path:
-        path_parts = path.replace('\\', '/').rstrip('/').split('/')
+        path_parts = path.rstrip('/').split('/')
         if len(path_parts) >= 1 and len(path_parts[-1]) == 32:
             md5 = path_parts[-1]
     
@@ -171,27 +182,25 @@ def generate_text_anim_code(item: dict) -> str:
     var_name = sanitize_effect_name(name)
     padded_var = f"{var_name:<20}"
     
-    # Generate code WITH path for CapCut compatibility
-    if path:
-        code = f'    {padded_var} = AnimationMeta("{name}", False, {duration_sec:.3f}, "{resource_id}", "{effect_id}", "{md5}", path="{path}")'
-    else:
-        code = f'    {padded_var} = AnimationMeta("{name}", False, {duration_sec:.3f}, "{resource_id}", "{effect_id}", "{md5}")'
+    # Generate code WITHOUT path (không thêm path)
+    code = f'    {padded_var} = AnimationMeta("{name}", False, {duration_sec:.3f}, "{resource_id}", "{effect_id}", "{md5}")'
     return code
 
 
 def generate_video_anim_code(item: dict) -> str:
-    """Generate code cho Video Intro/Outro/Combo animations"""
+    """Generate code cho Video Intro/Outro/Combo animations
+    
+    NOTE: Không thêm path vì path là local path của user
+    """
     name = item.get('name', 'Unknown')
     resource_id = item.get('resource_id', '')
     effect_id = item.get('id', '') or resource_id
     
-    # Get path - CRITICAL for animation to work in CapCut
-    path = item.get('path', '').replace('\\', '/')
-    
     # Try to get MD5 from path (format: .../resource_id/md5_hash)
     md5 = item.get('file_md5', '')
+    path = item.get('path', '').replace('\\', '/')
     if not md5 and path:
-        path_parts = path.replace('\\', '/').rstrip('/').split('/')
+        path_parts = path.rstrip('/').split('/')
         if len(path_parts) >= 1 and len(path_parts[-1]) == 32:
             md5 = path_parts[-1]
     
@@ -202,22 +211,66 @@ def generate_video_anim_code(item: dict) -> str:
     var_name = sanitize_effect_name(name)
     padded_var = f"{var_name:<20}"
     
-    # Generate code WITH path for CapCut compatibility
+    # Generate code WITHOUT path (không thêm path)
+    code = f'    {padded_var} = AnimationMeta("{name}", False, {duration_sec:.3f}, "{resource_id}", "{effect_id}", "{md5}")'
+    return code
+
+
+def generate_sticker_code(item: dict) -> str:
+    """Generate code cho StickerType (stickers - emoji, GIFs, animated stickers)
+    
+    Stickers use EffectMeta with category info similar to effects.
+    Located in materials.stickers[] in CapCut draft.
+    NOTE: Không thêm path vì path là local path của user
+    """
+    name = item.get('name', 'Unknown')
+    resource_id = item.get('resource_id', '') or item.get('sticker_id', '')
+    sticker_id = item.get('sticker_id', '') or resource_id
+    category_id = item.get('category_id', '')
+    category_name = item.get('category_name', '')
+    source_platform = item.get('source_platform', 0)
+    request_id = item.get('request_id', '')
+    
+    # Extract MD5 from path (format: .../artistEffect/resource_id/md5_hash)
+    md5 = ''
+    path = item.get('path', '').replace('\\', '/')
     if path:
-        code = f'    {padded_var} = AnimationMeta("{name}", False, {duration_sec:.3f}, "{resource_id}", "{effect_id}", "{md5}", path="{path}")'
-    else:
-        code = f'    {padded_var} = AnimationMeta("{name}", False, {duration_sec:.3f}, "{resource_id}", "{effect_id}", "{md5}")'
+        path_parts = path.rstrip('/').split('/')
+        if len(path_parts) >= 1 and len(path_parts[-1]) == 32:
+            md5 = path_parts[-1]
+    
+    var_name = sanitize_effect_name(name)
+    padded_var = f"{var_name:<20}"
+    
+    # Build kwargs - NO PATH (path là local, không đồng bộ)
+    kwargs = []
+    if category_name:
+        kwargs.append(f'category_name="{category_name}"')
+    if category_id:
+        kwargs.append(f'category_id="{category_id}"')
+    if source_platform:
+        kwargs.append(f'source_platform={source_platform}')
+    if request_id:
+        kwargs.append(f'request_id="{request_id}"')
+    
+    # EffectMeta signature: (name, is_pro, resource_id, effect_id, md5, params, **kwargs)
+    code = f'    {padded_var} = EffectMeta("{name}", False, "{resource_id}", "{sticker_id}", "{md5}", []'
+    if kwargs:
+        code += ', ' + ', '.join(kwargs)
+    code += ')'
     return code
 
 
 def generate_transition_code(item: dict) -> str:
-    """Generate code cho TransitionMeta (transitions)"""
+    """Generate code cho TransitionMeta (transitions)
+    
+    NOTE: Không thêm path vì path là local path của user
+    """
     name = item.get('name', 'Unknown')
     effect_id = item.get('effect_id', '')
     resource_id = item.get('resource_id', '')
     category_id = item.get('category_id', '')
     category_name = item.get('category_name', '')
-    path = item.get('path', '').replace('\\', '/')
     source_platform = item.get('source_platform', 0)
     request_id = item.get('request_id', '')
     # Duration từ CapCut draft là microseconds, cần convert sang seconds
@@ -228,13 +281,11 @@ def generate_transition_code(item: dict) -> str:
     var_name = sanitize_effect_name(name)
     padded_var = f"{var_name:<20}"
     
-    # TransitionMeta signature: (name, is_vip, resource_id, effect_id, md5, duration_in_seconds, is_overlap, *, path, category_name, category_id, source_platform, request_id)
+    # TransitionMeta signature - NO PATH
     code = f'    {padded_var} = TransitionMeta("{name}", False, "{resource_id}", "{effect_id}", "{category_id}", {duration_sec:.3f}, {is_overlap}'
     
-    # Build kwargs
+    # Build kwargs - NO PATH (không thêm path)
     kwargs = []
-    if path:
-        kwargs.append(f'path="{path}"')
     if category_name:
         kwargs.append(f'category_name="{category_name}"')
     if category_id:
@@ -319,7 +370,8 @@ def sync_all_from_draft(draft_folder: str, draft_name: str):
     print("   ├─ Text Outros → text_outro.py")
     print("   ├─ Video Intros → video_intro.py")
     print("   ├─ Video Outros → video_outro.py")
-    print("   └─ Combo Anims → combo_animation.py")
+    print("   ├─ Combo Anims → combo_animation.py")
+    print("   └─ Stickers → sticker_meta.py")
     print("=" * 80)
     
     # 1. Đọc draft
@@ -342,10 +394,22 @@ def sync_all_from_draft(draft_folder: str, draft_name: str):
     materials = data.get("materials", {})
     
     # 2. Thu thập items từ các nguồn
-    video_effects = materials.get("video_effects", [])
+    # Phân tách video_effects thành scene_effects (video_effect) và face_effects (face_effect)
+    all_video_effects = materials.get("video_effects", [])
+    scene_effects = []  # video_effect type -> video_scene_effect.py
+    face_effects = []   # face_effect type -> video_character_effect.py
+    
+    for eff in all_video_effects:
+        eff_type = eff.get("type", "video_effect")
+        if eff_type == "face_effect":
+            face_effects.append(eff)
+        else:
+            scene_effects.append(eff)
+    
     filters = materials.get("effects", [])  # "effects" key thường là filters
     audio_effects = materials.get("audio_effects", [])
     transitions = materials.get("transitions", [])
+    stickers = materials.get("stickers", [])  # Stickers (emoji, GIFs, animated stickers)
     
     # Extract fonts from text segments - check MULTIPLE sources
     fonts = []
@@ -437,20 +501,34 @@ def sync_all_from_draft(draft_folder: str, draft_name: str):
                 seen_fonts.add(font_name)
     
     # Extract animations from material_animations
-    # NOTE: Animations are nested inside material_animations[].animations[]
+    # NOTE: Classification based on material_type INSIDE each animation object:
+    #   materials -> material_animations -> animations[] -> {material_type, type, name}
+    #   - material_type == "video" + type == "in"  → Video Intro
+    #   - material_type == "video" + type == "out" → Video Outro
+    #   - material_type == "sticker" + type == "in"  → Text Intro
+    #   - material_type == "sticker" + type == "out" → Text Outro
+    #   - material_type == "sticker" + type == "loop" → Text Loop
     text_loops = []
     text_intros = []
     text_outros = []
-    seen_loops = set()
+    video_intros = []
+    video_outros = []
+    combo_anims = []
+    seen_text_loops = set()
     seen_text_intros = set()
     seen_text_outros = set()
+    seen_video_intros = set()
+    seen_video_outros = set()
+    seen_combos = set()
+    
     animations = materials.get("material_animations", [])
     for anim_container in animations:
         # Check inner animations array
         inner_anims = anim_container.get("animations", [])
         for inner in inner_anims:
+            # Read material_type and type from INSIDE each animation object
+            material_type = inner.get("material_type", "")
             anim_type = inner.get("type", "")
-            category = inner.get("category_name", "").lower()
             name = inner.get("name", "")
             resource_id = inner.get("resource_id", "")
             
@@ -461,62 +539,43 @@ def sync_all_from_draft(draft_folder: str, draft_name: str):
                 "name": name,
                 "resource_id": resource_id,
                 "effect_id": inner.get("effect_id", "") or resource_id,
-                "file_md5": inner.get("file_md5", ""),
-                "path": inner.get("path", ""),
-                "duration": inner.get("duration", 500000)
-            }
-            
-            # Classify animations by type
-            if anim_type == "loop" or "loop" in category:
-                if name not in seen_loops:
-                    text_loops.append(anim_data)
-                    seen_loops.add(name)
-            elif anim_type == "in" and name not in seen_text_intros:
-                text_intros.append(anim_data)
-                seen_text_intros.add(name)
-            elif anim_type == "out" and name not in seen_text_outros:
-                text_outros.append(anim_data)
-                seen_text_outros.add(name)
-    
-    # Extract video intro/outro/combo animations from material_animations
-    video_intros = []
-    video_outros = []
-    combo_anims = []
-    seen_intros = set()
-    seen_outros = set()
-    seen_combos = set()
-    
-    for anim_container in animations:
-        inner_anims = anim_container.get("animations", [])
-        for inner in inner_anims:
-            anim_type = inner.get("type", "")
-            name = inner.get("name", "")
-            resource_id = inner.get("resource_id", "")
-            
-            if not name or not resource_id:
-                continue
-            
-            anim_data = {
-                "name": name,
-                "resource_id": resource_id,
                 "id": inner.get("id", ""),
                 "file_md5": inner.get("file_md5", ""),
                 "path": inner.get("path", ""),
                 "duration": inner.get("duration", 500000)
             }
             
-            if anim_type == "in" and name not in seen_intros:
-                video_intros.append(anim_data)
-                seen_intros.add(name)
-            elif anim_type == "out" and name not in seen_outros:
-                video_outros.append(anim_data)
-                seen_outros.add(name)
-            elif anim_type == "group" and name not in seen_combos:
-                combo_anims.append(anim_data)
-                seen_combos.add(name)
+            # Classify based on material_type + type
+            if material_type == "video":
+                if anim_type == "in":
+                    if name not in seen_video_intros:
+                        video_intros.append(anim_data)
+                        seen_video_intros.add(name)
+                elif anim_type == "out":
+                    if name not in seen_video_outros:
+                        video_outros.append(anim_data)
+                        seen_video_outros.add(name)
+                elif anim_type == "group":
+                    if name not in seen_combos:
+                        combo_anims.append(anim_data)
+                        seen_combos.add(name)
+            elif material_type == "sticker":
+                if anim_type == "in":
+                    if name not in seen_text_intros:
+                        text_intros.append(anim_data)
+                        seen_text_intros.add(name)
+                elif anim_type == "out":
+                    if name not in seen_text_outros:
+                        text_outros.append(anim_data)
+                        seen_text_outros.add(name)
+                elif anim_type == "loop":
+                    if name not in seen_text_loops:
+                        text_loops.append(anim_data)
+                        seen_text_loops.add(name)
     
     print(f"\n📊 Tìm thấy trong draft:")
-    print(f"   ├─ video_effects: {len(video_effects)}")
+    print(f"   ├─ scene_effects (video_effect): {len(scene_effects)}")
+    print(f"   ├─ face_effects (face_effect): {len(face_effects)}")
     print(f"   ├─ filters (effects): {len(filters)}")
     print(f"   ├─ audio_effects: {len(audio_effects)}")
     print(f"   ├─ transitions: {len(transitions)}")
@@ -526,23 +585,39 @@ def sync_all_from_draft(draft_folder: str, draft_name: str):
     print(f"   ├─ text_outros: {len(text_outros)}")
     print(f"   ├─ video_intros: {len(video_intros)}")
     print(f"   ├─ video_outros: {len(video_outros)}")
-    print(f"   └─ combo_anims: {len(combo_anims)}")
+    print(f"   ├─ combo_anims: {len(combo_anims)}")
+    print(f"   └─ stickers: {len(stickers)}")
     
     total_added = 0
     
-    # 3. XỬ LÝ VIDEO EFFECTS
-    if video_effects:
-        print_section("XỬ LÝ VIDEO EFFECTS")
+    # 3. XỬ LÝ SCENE EFFECTS (video_effect type)
+    if scene_effects:
+        print_section("XỬ LÝ SCENE EFFECTS (video_effect)")
         print(f"📖 File đích: {os.path.basename(EFFECT_FILE)}")
         
         existing = get_existing_names(EFFECT_FILE)
         print(f"   Đã có: {len(existing)} effects")
         
         added, skipped = add_items_to_file(
-            video_effects, EFFECT_FILE, existing, "effect", generate_effect_code
+            scene_effects, EFFECT_FILE, existing, "scene effect", generate_effect_code
         )
-        print_results(added, skipped, "effects")
+        print_results(added, skipped, "scene effects")
         total_added += added
+    
+    # 3b. XỬ LÝ FACE EFFECTS (face_effect type)
+    if face_effects:
+        print_section("XỬ LÝ FACE EFFECTS (face_effect)")
+        print(f"📖 File đích: {os.path.basename(CHARACTER_EFFECT_FILE)}")
+        
+        existing = get_existing_names(CHARACTER_EFFECT_FILE)
+        print(f"   Đã có: {len(existing)} effects")
+        
+        added, skipped = add_items_to_file(
+            face_effects, CHARACTER_EFFECT_FILE, existing, "face effect", generate_effect_code
+        )
+        print_results(added, skipped, "face effects")
+        total_added += added
+
     
     # 4. XỬ LÝ FILTERS
     if filters:
@@ -684,12 +759,26 @@ def sync_all_from_draft(draft_folder: str, draft_name: str):
         print_results(added, skipped, "combo anims")
         total_added += added
     
-    # 14. Tổng kết
+    # 14. XỬ LÝ STICKERS
+    if stickers:
+        print_section("XỬ LÝ STICKERS")
+        print(f"📖 File đích: {os.path.basename(STICKER_FILE)}")
+        
+        existing = get_existing_names(STICKER_FILE)
+        print(f"   Đã có: {len(existing)} stickers")
+        
+        added, skipped = add_items_to_file(
+            stickers, STICKER_FILE, existing, "sticker", generate_sticker_code
+        )
+        print_results(added, skipped, "stickers")
+        total_added += added
+    
+    # 15. Tổng kết
     print("\n" + "=" * 80)
     if total_added > 0:
         print(f"🎉 HOÀN THÀNH! Đã thêm tổng cộng {total_added} items mới!")
     else:
-        all_empty = not (video_effects or filters or audio_effects or transitions or fonts or text_loops or text_intros or text_outros or video_intros or video_outros or combo_anims)
+        all_empty = not (scene_effects or face_effects or filters or audio_effects or transitions or fonts or text_loops or text_intros or text_outros or video_intros or video_outros or combo_anims or stickers)
         if all_empty:
             print(f"⚠️ Không tìm thấy effects/animations nào trong draft!")
         else:

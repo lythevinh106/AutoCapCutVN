@@ -2039,3 +2039,11 @@ class VideoCharacterEffectType(EffectEnum):
     """参数:
     effects_adjust_intensity: 默认80%, 0% ~ 100%
     effects_adjust_filter: 默认80%, 0% ~ 100%"""
+
+    # === VINH AUTO-IMPORTED FACE EFFECTS ===
+    Electric_Eyes        = EffectMeta("Electric Eyes", False, "7399483006278307077", "7399483006278307077", "12aed71e7e62dafe99b6ff5ef264a36d", [], category_name="Trending", category_id="27343", source_platform=1, request_id="20251221161103553A5458A7BC180BC1D1")
+    Neon_Variation       = EffectMeta("Neon Variation", False, "7399480953715936517", "7399480953715936517", "1fca51ec5627ab19543f51e79beeab4d", [], category_name="Trending", category_id="27343", source_platform=1, request_id="2025122711485134EC5C0A614EA12AC6BC")
+
+    # === VINH AUTO-IMPORTED FACE EFFECTS ===
+    Lightning_Eyes       = EffectMeta("Lightning Eyes", False, "7399481529723800838", "7399481529723800838", "6b6b4e9eb53581fea08118f62d55c1a9", [], category_name="Trending", category_id="27343", source_platform=1, request_id="20251221161103553A5458A7BC180BC1D1")
+    Gothic               = EffectMeta("Gothic", False, "7399483785554824454", "7399483785554824454", "f0a791b47d3c747c81389457b07c6460", [], category_name="Trending", category_id="27343", source_platform=1, request_id="20251221161103553A5458A7BC180BC1D1")

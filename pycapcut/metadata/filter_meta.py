@@ -1004,16 +1004,10 @@ class FilterType(EffectEnum):
     黑金                 = EffectMeta("黑金", True, "7146475570623156738", "7146475570623156738", "9bd1add435ea65bdf3c51f5e8597952d", [])
     黑黄                 = EffectMeta("黑黄", True, "7226300464638202370", "7226300464638202370", "3b8072fd5557a0480151e937fa4c2c51", [])
 
+ 
     # === VINH AUTO-IMPORTED FILTERS ===
-    _8K                  = EffectMeta("8K", False, "7480476382338813239", "7480476382338813239", "25516", [], path="C:/Users/VINH/AppData/Local/CapCut/User Data/Cache/effect/7480476382338813239/ccd56f031f17b773af5f03961641827a", category_name="Featured", category_id="25516", source_platform=1, request_id="202512201714007795EABEA01CA5AF4C4F")
-    Universal_Sunset     = EffectMeta("Universal Sunset", False, "7519721968254438657", "7519721968254438657", "25516", [], path="C:/Users/VINH/AppData/Local/CapCut/User Data/Cache/effect/7519721968254438657/0b4b43fb40421615fa7ef2c67da51c93", category_name="Featured", category_id="25516", source_platform=1, request_id="202512201714007795EABEA01CA5AF4C4F")
-
-    # === VINH AUTO-IMPORTED FILTERS ===
-    Elegant_B_W          = EffectMeta("Elegant B&W", False, "7394399556227568129", "7394399556227568129", "25516", [], path="C:/Users/VINH/AppData/Local/CapCut/User Data/Cache/effect/7394399556227568129/c35e784804029d3cbae7cec81cc72f56", category_name="Featured", category_id="25516", source_platform=1, request_id="202512211140568054D8D7D17022E872F3")
-    Fresh_Lime           = EffectMeta("Fresh Lime", False, "7544864273009331457", "7544864273009331457", "25516", [], path="C:/Users/VINH/AppData/Local/CapCut/User Data/Cache/effect/7544864273009331457/0c69a2c97b22ebcadb813a34e59c30cc", category_name="Featured", category_id="25516", source_platform=1, request_id="202512201714007795EABEA01CA5AF4C4F")
-
-    # === VINH AUTO-IMPORTED FILTERS ===
-    Flirtation           = EffectMeta("Flirtation", False, "7268607066887950849", "7268607066887950849", "25516", [], path="C:/Users/VINH/AppData/Local/CapCut/User Data/Cache/effect/7268607066887950849/f325dcefb566f8eff99bafb2fc7925a9", category_name="Featured", category_id="25516", source_platform=1, request_id="202512201714007795EABEA01CA5AF4C4F")
-
-    # === VINH AUTO-IMPORTED FILTERS ===
-    Spring_Chorus        = EffectMeta("Spring Chorus", False, "6944899227596100098", "6944899227596100098", "25516", [], path="C:/Users/VINH/AppData/Local/CapCut/User Data/Cache/effect/6944899227596100098/d6a901da9f20e52d58fcb02912752ca9", category_name="Featured", category_id="25516", source_platform=1, request_id="202512201714007795EABEA01CA5AF4C4F")
+    Hasselblad           = EffectMeta("Hasselblad", False, "7409977607392875024", "7409977607392875024", "1dabe62d10dc8a7f434e1927856942cd", [], category_name="Life", category_id="18578", source_platform=1, request_id="202512271729019B663800FD8C3A6A2AE0")
+    Quality_ll           = EffectMeta("Quality ll", False, "7220376610380190210", "7220376610380190210", "3ec0d714ea1b0fb34e998e23a89e544f", [], category_name="Life", category_id="18578", source_platform=1, request_id="202512271729019B663800FD8C3A6A2AE0")
+    Past_Fame            = EffectMeta("Past Fame", False, "7568856381994863877", "7568856381994863877", "b9f3232d03c6f3fb36fba0a975b04d71", [], category_name="New Year🎆", category_id="2037709563", source_platform=1, request_id="20251227124140928A59269726B7205323")
+    Vintage_Copper       = EffectMeta("Vintage Copper", False, "7569556260891266317", "7569556260891266317", "8611fbe624409731e068d9d008302c7d", [], category_name="Christmas🎄", category_id="39696", source_platform=1, request_id="20251227172853C0B454CC730E8E5B248A")
+    _4K                  = EffectMeta("4K", False, "7426678351957332497", "7426678351957332497", "3381cda21304c1eb4664f3bdfe945869", [], category_name="Featured", category_id="25516", source_platform=1, request_id="20251227124140928A59269726B7205323")

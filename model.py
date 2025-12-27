@@ -218,6 +218,16 @@ class TextItem(BaseModel):
     animation: Optional[Animations] = Field(default=None, description="Text animations")
 
 
+class StickerItem(BaseModel):
+    """Sticker overlay item (emoji, GIFs, animated stickers)"""
+    timeline_priority: int = Field(default=5, description="Render order (5 = sticker layer)")
+    type: str = Field(..., description="Sticker type from sticker_meta.py (e.g. 'Pets_EN___Cute_Cat')")
+    start_ms: int = Field(default=0, description="Start time on timeline")
+    duration_ms: int = Field(..., description="Display duration")
+    position: Optional[Position] = Field(default_factory=Position, description="Position on canvas (-1 to 1)")
+    scale: float = Field(default=1.0, description="Sticker scale")
+
+
 # ==========================================
 # 3. ROOT MODEL (Main Request)
 # ==========================================
@@ -238,6 +248,7 @@ class EditRequest(BaseModel):
     filters: List[FilterItem] = Field(default_factory=list, description="Filters")
     images: List[ImageItem] = Field(default_factory=list, description="Image overlays")
     texts: List[TextItem] = Field(default_factory=list, description="Text overlays")
+    stickers: List[StickerItem] = Field(default_factory=list, description="Sticker overlays")
 
     @field_validator('video_sequence')
     @classmethod

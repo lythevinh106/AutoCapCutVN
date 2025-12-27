@@ -2284,7 +2284,10 @@ class TransitionType(EffectEnum):
     """默认时长: 0.60s"""
 
    
+ 
     # === VINH AUTO-IMPORTED TRANSITIONS ===
-    Comparison_II        = TransitionMeta("Comparison II", False, "7299460949180682754", "7299460949180682754", "25835", 0.400, True, path="C:/Users/VINH/AppData/Local/CapCut/User Data/Cache/effect/7299460949180682754/64e8f4a060901fd4349301f97fbdd172", category_name="Trending", category_id="25835", source_platform=1, request_id="20251221120147B61F8986C103FDE60958")
-    Split_off_Cube       = TransitionMeta("Split-off Cube", False, "7537534640341404945", "7537534640341404945", "25835", 0.800, True, path="C:/Users/VINH/AppData/Local/CapCut/User Data/Cache/effect/7537534640341404945/b0c90b1fcf4c687a78716bc8794f525d", category_name="Trending", category_id="25835", source_platform=1, request_id="2025122023082228F758C7C0F028746E2F")
-    Gradual_Dissolve     = TransitionMeta("Gradual Dissolve", False, "7567289154564918533", "7567289154564918533", "25835", 0.533, True, path="C:/Users/VINH/AppData/Local/CapCut/User Data/Cache/effect/7567289154564918533/7ed4d14615773310a1b314d5d57f7a75", category_name="Trending", category_id="25835", source_platform=1, request_id="202512211234363E9271EA627ABDEA8C5C")
+
+    # === VINH AUTO-IMPORTED TRANSITIONS ===
+    Train                = TransitionMeta("Train", False, "7207719995063669250", "7207719995063669250", "25835", 1.333, False, category_name="Trending", category_id="25835", source_platform=1, request_id="20251227172821C0B454CC730E8E5B1167")
+    Star_Screen          = TransitionMeta("Star Screen", False, "7497042437244865809", "7497042437244865809", "25835", 1.300, True, category_name="Trending", category_id="25835", source_platform=1, request_id="20251227172821C0B454CC730E8E5B1167")
+    Dollar_Bills_II      = TransitionMeta("Dollar Bills II", False, "7242153752742859265", "7242153752742859265", "25835", 1.500, True, category_name="Trending", category_id="25835", source_platform=1, request_id="202512271736443F1AAAE094B20B6609E5")
