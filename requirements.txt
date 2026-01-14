@@ -3,3 +3,7 @@ imageio
 uiautomation>=2
 flask>=2.0.0
 werkzeug>=2.0.0
+pydantic>=2.0.0
+librosa>=0.10.0
+numpy>=1.23.0
+soundfile>=0.12.0

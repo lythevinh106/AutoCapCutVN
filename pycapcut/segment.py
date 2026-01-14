@@ -77,22 +77,47 @@ class BaseSegment:
         }
 
 class Speed:
-    """播放速度对象, 目前只支持固定速度"""
+    """播放速度对象, 支持固定速度和曲线速度"""
 
     global_id: str
     """全局id, 由程序自动生成"""
     speed: float
-    """播放速度"""
+    """播放速度 (average speed for curve mode)"""
+    mode: int
+    """速度模式: 0=固定速度, 1=曲线速度"""
+    curve_speed: dict
+    """曲线速度数据 (仅mode=1时有效)"""
 
-    def __init__(self, speed: float):
+    def __init__(self, speed: float, curve_meta=None):
+        """初始化速度对象
+        
+        Args:
+            speed: 播放速度或平均速度
+            curve_meta: SpeedCurveMeta对象 (可选, 传入则使用曲线速度)
+        """
         self.global_id = uuid.uuid4().hex
-        self.speed = speed
+        
+        if curve_meta is not None:
+            # Curve speed mode
+            self.mode = 1
+            self.speed = curve_meta.average_speed
+            self.curve_speed = {
+                "id": curve_meta.curve_id,
+                "name": curve_meta.name,
+                "source_platform": curve_meta.source_platform,
+                "speed_points": [{"x": x, "y": y} for x, y in curve_meta.speed_points]
+            }
+        else:
+            # Fixed speed mode
+            self.mode = 0
+            self.speed = speed
+            self.curve_speed = None
 
     def export_json(self) -> Dict[str, Any]:
         return {
-            "curve_speed": None,
+            "curve_speed": self.curve_speed,
             "id": self.global_id,
-            "mode": 0,
+            "mode": self.mode,
             "speed": self.speed,
             "type": "speed"
         }
@@ -191,11 +216,12 @@ class MediaSegment(BaseSegment):
     extra_material_refs: List[str]
     """附加的素材id列表, 用于链接动画/特效等"""
 
-    def __init__(self, material_id: str, source_timerange: Optional[Timerange], target_timerange: Timerange, speed: float, volume: float):
+    def __init__(self, material_id: str, source_timerange: Optional[Timerange], target_timerange: Timerange, 
+                 speed: float, volume: float, *, curve_meta=None):
         super().__init__(material_id, target_timerange)
 
         self.source_timerange = source_timerange
-        self.speed = Speed(speed)
+        self.speed = Speed(speed, curve_meta)
         self.volume = volume
 
         self.extra_material_refs = [self.speed.global_id]
@@ -227,7 +253,7 @@ class VisualSegment(MediaSegment):
     """
 
     def __init__(self, material_id: str, source_timerange: Optional[Timerange], target_timerange: Timerange,
-                 speed: float, volume: float, *, clip_settings: Optional[ClipSettings]):
+                 speed: float, volume: float, *, clip_settings: Optional[ClipSettings], curve_meta=None):
         """初始化视觉片段基类
 
         Args:
@@ -237,8 +263,9 @@ class VisualSegment(MediaSegment):
             speed (`float`): 播放速度
             volume (`float`): 音量
             clip_settings (`ClipSettings`, optional): 图像调节设置, 默认不作任何变换
+            curve_meta (`SpeedCurveMeta`, optional): 曲线速度元数据, 传入则使用曲线速度
         """
-        super().__init__(material_id, source_timerange, target_timerange, speed, volume)
+        super().__init__(material_id, source_timerange, target_timerange, speed, volume, curve_meta=curve_meta)
 
         self.clip_settings = clip_settings if clip_settings is not None else ClipSettings()
         self.uniform_scale = True

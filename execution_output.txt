@@ -1,0 +1,32 @@
+WARNING: librosa not installed. Run: pip install librosa
+======================================================================
+  🎵 LIBROSA AUDIO ANALYSIS SERVICE - COMPREHENSIVE TEST
+======================================================================
+
+📋 Checking test files...
+   ✓ audio.mp3
+
+📊 Found 1 test files
+
+----------------------------------------------------------------------
+Select test mode:
+  1. Test first available file (detailed)
+  2. Test all files (detailed)
+  3. Comparison test (summary)
+  4. Quick test (first file, no HPSS)
+----------------------------------------------------------------------
+Auto-selected choice 1
+
+======================================================================
+  TESTING: audio
+======================================================================
+📁 File: F:\AutoEdit Video OpenSource\pyCapCut\readme_assets\tutorial\audio.mp3
+📊 File size: 0.12 MB
+Traceback (most recent call last):
+  File "F:\AutoEdit Video OpenSource\pyCapCut\test_librosa_service.py", line 403, in <module>
+    run_all_tests(available_files[0], OUTPUT_DIR)
+  File "F:\AutoEdit Video OpenSource\pyCapCut\test_librosa_service.py", line 276, in run_all_tests
+    service = AudioAnalysisService(sample_rate=22050, hop_length=512)
+  File "F:\AutoEdit Video OpenSource\pyCapCut\audio_analysis_service.py", line 141, in __init__
+    raise ImportError("librosa is required. Install with: pip install librosa")
+ImportError: librosa is required. Install with: pip install librosa

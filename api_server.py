@@ -226,6 +226,7 @@ def create_amv_project_video():
         # ===== 4. PROCESS EACH COMPONENT =====
         processing_results = {
             "video_sequence": {"count": 0, "status": "pending"},
+            "per_video_effects": {"count": 0, "status": "pending"},
             "audios": {"count": 0, "status": "pending"},
             "effects": {"count": 0, "status": "pending"},
             "filters": {"count": 0, "status": "pending"},
@@ -249,10 +250,13 @@ def create_amv_project_video():
                 video_mat = cc.VideoMaterial(video_item.source)
                 
                 # Calculate duration (ms to microseconds)
+                # For speed > 1, max target = video_duration / speed
+                effective_speed = video_item.speed if video_item.speed else 1.0
                 if video_item.duration_ms:
                     segment_duration = video_item.duration_ms * 1000  # ms to us
                 else:
-                    segment_duration = video_mat.duration  # Full video duration
+                    # Auto-calculate max possible target duration based on speed
+                    segment_duration = round(video_mat.duration / effective_speed)
                 
                 # Calculate source trim
                 source_start = video_item.start_trim_ms * 1000 if video_item.start_trim_ms else 0
@@ -270,6 +274,12 @@ def create_amv_project_video():
                     flip_vertical=transform.flip_vertical if transform else False
                 )
                 
+                # Get speed curve meta if specified
+                curve_meta = None
+                if video_item.speed_curve:
+                    from pycapcut.metadata.speed_curve_meta import SpeedCurveType
+                    curve_meta = getattr(SpeedCurveType, video_item.speed_curve, None)
+                
                 # Create video segment
                 video_seg = cc.VideoSegment(
                     video_mat,
@@ -277,7 +287,8 @@ def create_amv_project_video():
                     source_timerange=trange(source_start, segment_duration) if source_start else None,
                     speed=video_item.speed if video_item.speed != 1.0 else None,
                     volume=video_item.volume,
-                    clip_settings=clip_settings
+                    clip_settings=clip_settings,
+                    curve_meta=curve_meta
                 )
                 
                 # --- Add intro animation ---
@@ -325,8 +336,51 @@ def create_amv_project_video():
                 script.add_segment(video_seg)
                 video_segments_list.append(video_seg)
                 
-                # Update timeline position for next video (concatenate)
-                current_timeline_position += segment_duration
+                # --- Add per-video effects ---
+                if video_item.effects:
+                    video_start_us = video_seg.target_timerange.start
+                    video_duration_us = video_seg.target_timerange.duration
+                    
+                    for effect_idx, video_effect in enumerate(video_item.effects):
+                        try:
+                            # Get effect type based on category
+                            effect_type = None
+                            if video_effect.category == 'scene':
+                                effect_type = getattr(cc.VideoSceneEffectType, video_effect.type, None)
+                            else:
+                                effect_type = getattr(cc.VideoCharacterEffectType, video_effect.type, None)
+                            
+                            if effect_type:
+                                # Create unique track name for this video's effect
+                                track_name = f"video_{idx:02d}_effect_{effect_idx:02d}"
+                                try:
+                                    script.add_track(cc.TrackType.effect, track_name=track_name)
+                                except:
+                                    pass
+                                
+                                # Calculate effect timing
+                                effect_start_offset_us = video_effect.start_offset_ms * 1000  # ms to us
+                                effect_start_us = video_start_us + effect_start_offset_us
+                                
+                                # Calculate effect duration
+                                if video_effect.duration_ms:
+                                    effect_duration_us = video_effect.duration_ms * 1000  # ms to us
+                                else:
+                                    # Default: effect lasts for video's remaining duration
+                                    effect_duration_us = video_duration_us - effect_start_offset_us
+                                
+                                # Add effect at calculated position
+                                script.add_effect(
+                                    effect_type,
+                                    trange(effect_start_us, effect_duration_us),
+                                    track_name=track_name,
+                                    params=video_effect.params
+                                )
+                        except Exception as ve_err:
+                            pass  # Per-video effect error shouldn't fail the request
+                
+                # Update timeline position for next video (use ACTUAL segment duration)
+                current_timeline_position += video_seg.target_timerange.duration
                 
             except Exception as ve:
                 processing_results["video_sequence"]["status"] = f"Error on video {idx}: {str(ve)}"
@@ -347,6 +401,11 @@ def create_amv_project_video():
         
         processing_results["video_sequence"]["count"] = video_count
         processing_results["video_sequence"]["status"] = "completed"
+        
+        # Count per-video effects
+        per_video_effects_count = sum(len(v.effects) for v in edit_request.video_sequence)
+        processing_results["per_video_effects"]["count"] = per_video_effects_count
+        processing_results["per_video_effects"]["status"] = "completed" if per_video_effects_count > 0 else "skipped (no per-video effects)"
         
         # Calculate total video duration
         total_video_duration_ms = current_timeline_position // 1000
@@ -2849,4 +2908,13 @@ if __name__ == '__main__':
     print(f"📁 Default draft folder: {DRAFT_FOLDER}")
     print(f"🔧 Debug mode: {DEBUG}")
     print(f"\n📖 API documentation available at: http://localhost:{PORT}/")
-    app.run(host='0.0.0.0', port=PORT, debug=DEBUG)
+    
+    if DEBUG:
+        # Development mode - use Flask dev server
+        app.run(host='0.0.0.0', port=PORT, debug=True)
+    else:
+        # Production mode - use Waitress WSGI server
+        from waitress import serve
+        print("🚀 Running in PRODUCTION mode with Waitress WSGI server")
+        serve(app, host='0.0.0.0', port=PORT, threads=4)
+

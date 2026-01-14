@@ -102,6 +102,15 @@ class AudioItem(BaseModel):
     keyframes: List[Keyframe] = Field(default_factory=list, description="Volume keyframes")
 
 
+class VideoEffectItem(BaseModel):
+    """Video effect item for per-video effects (applied only during video's duration)"""
+    type: str = Field(..., description="Effect type from GET /get_video_scene_effect_types")
+    category: str = Field(default="scene", description="'scene' or 'character'")
+    start_offset_ms: int = Field(default=0, description="Start offset from video start in ms (default 0 = effect starts when video starts)")
+    duration_ms: Optional[int] = Field(default=None, description="Effect duration in ms (default null = effect lasts for video's remaining duration)")
+    params: Optional[List[float]] = Field(default=None, description="Effect parameters [0-100, ...]")
+
+
 class VideoItem(BaseModel):
     """Video sequence item"""
     timeline_priority: int = Field(default=2, description="Render order")
@@ -109,7 +118,8 @@ class VideoItem(BaseModel):
     start_trim_ms: int = Field(default=0, description="Trim from source start")
     duration_ms: Optional[int] = Field(default=None, description="Duration, null for full video")
     volume: float = Field(default=1.0, description="Audio volume (0-1)")
-    speed: float = Field(default=1.0, description="Playback speed")
+    speed: float = Field(default=1.0, description="Playback speed (ignored if speed_curve is set)")
+    speed_curve: Optional[str] = Field(default=None, description="Speed curve preset: Montage, Hero, Bullet, Jump_cut, Flash_in, Flash_out")
     transform: Optional[Transform] = Field(default_factory=Transform, description="Transform settings")
     intro_animation: Optional[AnimationConfig] = Field(default=None, description="Intro animation")
     outro_animation: Optional[AnimationConfig] = Field(default=None, description="Outro animation")
@@ -117,6 +127,7 @@ class VideoItem(BaseModel):
     background_fill: Optional[BackgroundFill] = Field(default=None, description="Background fill")
     mask: Optional[Mask] = Field(default=None, description="Mask settings")
     keyframes: List[Keyframe] = Field(default_factory=list, description="Animation keyframes")
+    effects: List["VideoEffectItem"] = Field(default_factory=list, description="Per-video effects (applied only during this video's duration)")
 
 
 class EffectItem(BaseModel):

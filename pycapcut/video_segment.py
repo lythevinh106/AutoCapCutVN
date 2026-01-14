@@ -351,7 +351,7 @@ class VideoSegment(VisualSegment):
 
     def __init__(self, material: Union[VideoMaterial, str], target_timerange: Timerange, *,
                  source_timerange: Optional[Timerange] = None, speed: Optional[float] = None, volume: float = 1.0,
-                 clip_settings: Optional[ClipSettings] = None):
+                 clip_settings: Optional[ClipSettings] = None, curve_meta=None):
         """利用给定的视频/图片素材构建一个轨道片段, 并指定其时间信息及图像调节设置
 
         Args:
@@ -361,6 +361,7 @@ class VideoSegment(VisualSegment):
             speed (`float`, optional): 播放速度, 默认为1.0. 此项与`source_timerange`同时指定时, 将覆盖`target_timerange`中的时长
             volume (`float`, optional): 音量, 默认为1.0
             clip_settings (`ClipSettings`, optional): 图像调节设置, 默认不作任何变换
+            curve_meta (`SpeedCurveMeta`, optional): 曲线速度元数据, 传入则使用曲线速度, 忽略speed参数
 
         Raises:
             `ValueError`: 指定的或计算出的`source_timerange`超出了素材的时长范围
@@ -368,7 +369,14 @@ class VideoSegment(VisualSegment):
         if isinstance(material, str):
             material = VideoMaterial(material)
 
-        if source_timerange is not None and speed is not None:
+        # If curve_meta provided, use full source video with curve speed
+        if curve_meta is not None:
+            speed = curve_meta.average_speed
+            # For speed curves, use FULL source video - curve handles variable speed
+            source_timerange = Timerange(0, material.duration)
+            # Target duration = source_duration / average_speed
+            target_timerange = Timerange(target_timerange.start, round(material.duration / speed))
+        elif source_timerange is not None and speed is not None:
             target_timerange = Timerange(target_timerange.start, round(source_timerange.duration / speed))
         elif source_timerange is not None and speed is None:
             speed = source_timerange.duration / target_timerange.duration
@@ -379,7 +387,8 @@ class VideoSegment(VisualSegment):
         if source_timerange.end > material.duration:
             raise ValueError(f"截取的素材时间范围 {source_timerange} 超出了素材时长({material.duration})")
 
-        super().__init__(material.material_id, source_timerange, target_timerange, speed, volume, clip_settings=clip_settings)
+        super().__init__(material.material_id, source_timerange, target_timerange, speed, volume, 
+                         clip_settings=clip_settings, curve_meta=curve_meta)
 
         self.material_instance = deepcopy(material)
         self.material_size = (material.width, material.height)

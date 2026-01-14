@@ -1,59 +1,35 @@
 # ====================================================================================================
-# pyCapCut API Server - FULL API DOCUMENTATION v2.0
+# pyCapCut API Server - COMPOSITE PROJECT ENDPOINT
 # Base URL: http://localhost:8000
-# Updated: 2024-12
+# Updated: 2024-12-27
 # ====================================================================================================
 
 
 # ====================================================================================================
-# 🏠 API: Home / API Info (`/`)
+# 🎬 API: Create AMV Project Video (`/create_amv_project_video`)
 # ====================================================================================================
-# Endpoint trả về thông tin tổng quan về API server và danh sách các endpoint.
+# API tạo một project video hoàn chỉnh từ một JSON request duy nhất.
+# 
+# Components:
+#   - canvas_config: Cấu hình canvas (BẮT BUỘC)
+#   - video_sequence: Danh sách video (BẮT BUỘC, ít nhất 1)
+#   - audios: Danh sách audio (TÙY CHỌN)
+#   - effects: Danh sách video effects (TÙY CHỌN)
+#   - filters: Danh sách filters (TÙY CHỌN)
+#   - images: Danh sách image overlays (TÙY CHỌN)
+#   - texts: Danh sách text overlays (TÙY CHỌN)
+#   - stickers: Danh sách stickers (TÙY CHỌN)
 
 # 🔌 Endpoint Info
-# | Method | URL                    |
-# | GET    | http://localhost:8000/ |
-
-# 💻 cURL Request
-curl -X GET http://localhost:8000/
-
-# 📋 Response mẫu
-# {
-#   "success": true,
-#   "output": {
-#     "service": "pyCapCut API Server",
-#     "version": "2.0.0",
-#     "endpoints": {...}
-#   },
-#   "error": ""
-# }
+# | Method | URL                                           |
+# | POST   | http://localhost:8000/create_amv_project_video |
 
 
 # ====================================================================================================
-# 🩺 API: Health Check (`/health`)
+# 💻 cURL Request - MINIMAL (chỉ có các trường bắt buộc)
 # ====================================================================================================
-# Endpoint kiểm tra trạng thái server.
 
-# 🔌 Endpoint Info
-# | Method | URL                        |
-# | GET    | http://localhost:8000/health |
-
-# 💻 cURL Request
-curl -X GET http://localhost:8000/health
-
-
-# ====================================================================================================
-# 🎬 COMPOSITE PROJECT API (Single-Request Video Creation)
-# ====================================================================================================
-# API này cho phép tạo một project video hoàn chỉnh từ một JSON request duy nhất.
-# Bao gồm: video_sequence (BẮT BUỘC), audios, effects, filters, images, texts (TÙY CHỌN)
-
-# 🔌 Endpoint Info
-# | Method | URL                                    |
-# | POST   | http://localhost:8000/create_project_video |
-
-# 💻 cURL Request (Minimal - chỉ có các trường bắt buộc)
-curl -X POST http://localhost:8000/create_project_video \
+curl -X POST http://localhost:8000/create_amv_project_video \
   -H "Content-Type: application/json" \
   -d '{
     "canvas_config": {
@@ -62,1322 +38,706 @@ curl -X POST http://localhost:8000/create_project_video \
     },
     "video_sequence": [
       {
-        "source": "F:/Videos/intro.mp4"
+        "source": "C:/Videos/video1.mp4"
       }
     ]
   }'
 
-# 💻 cURL Request (Full Options - tất cả các trường)
-curl -X POST http://localhost:8000/create_project_video \
+
+# ====================================================================================================
+# 💻 cURL Request - FULL OPTIONS (TẤT CẢ các trường với đầy đủ nested objects)
+# ====================================================================================================
+
+curl -X POST http://localhost:8000/create_amv_project_video \
   -H "Content-Type: application/json" \
   -d '{
+    
     "canvas_config": {
       "width": 1080,
       "height": 1920,
       "fps": 30,
-      "duration_ms": 60000
+      "duration_ms": null
     },
+
     "video_sequence": [
       {
         "timeline_priority": 2,
-        "source": "F:/Videos/intro.mp4",
+        "source": "C:/Users/VINH/Pictures/Store veo3/__description_202508132224.mp4",
         "start_trim_ms": 0,
         "duration_ms": 5000,
-        "volume": 1.0,
+        "volume": 0.3,
         "speed": 1.0,
-        "transform": { "x": 0, "y": 0, "scale_x": 1.0, "scale_y": 1.0, "rotation": 0, "alpha": 1.0 },
-        "intro_animation": { "type": "渐显", "duration_ms": 500 },
-        "outro_animation": { "type": "渐隐", "duration_ms": 500 },
-        "transition_to_next": { "type": "White_Flash", "duration_ms": 500 },
-        "background_fill": { "type": "blur", "intensity": 0.375 },
-        "mask": { "type": "圆形", "size": 0.5, "feather": 0, "invert": false }
+        "transform": {
+          "x": 0,
+          "y": 0,
+          "scale_x": 1.0,
+          "scale_y": 1.0,
+          "rotation": 0,
+          "alpha": 1.0,
+          "flip_horizontal": false,
+          "flip_vertical": false
+        },
+        "intro_animation": {
+          "type": "Winter_Sun",
+          "duration_ms": 2000
+        },
+        "outro_animation": {
+          "type": "Layers",
+          "duration_ms": 1633
+        },
+        "transition_to_next": {
+          "type": "Train",
+          "duration_ms": 1333
+        },
+        "background_fill": {
+          "type": "blur",
+          "intensity": 0.375,
+          "color": "#000000FF"
+        },
+        "mask": {
+          "type": "圆形",
+          "center_x": 0,
+          "center_y": 0,
+          "size": 0.5,
+          "rotation": 0,
+          "feather": 0,
+          "invert": false,
+          "rect_width": null,
+          "round_corner": null
+        },
+        "keyframes": [
+          {
+            "time_offset_ms": 0,
+            "property": "scale_x",
+            "value": 1.0
+          },
+          {
+            "time_offset_ms": 2500,
+            "property": "scale_x",
+            "value": 1.2
+          }
+        ],
+        "effects": [
+          {
+            "type": "Twinkle_Dust",
+            "category": "scene",
+            "start_offset_ms": 0,
+            "duration_ms": 3000,
+            "params": [80, 60, 40]
+          }
+        ]
+      },
+      {
+        "source": "C:/Users/VINH/Pictures/Store veo3/__description_202508132227.mp4",
+        "duration_ms": 5000,
+        "volume": 0.3,
+        "intro_animation": {"type": "Magic_Burst", "duration_ms": 2000},
+        "transition_to_next": {"type": "Star_Screen", "duration_ms": 1300},
+        "background_fill": {"type": "blur", "intensity": 0.375}
+      },
+      {
+        "source": "C:/Users/VINH/Pictures/Store veo3/__description_202508101516.mp4",
+        "duration_ms": 5000,
+        "volume": 0.3,
+        "intro_animation": {"type": "Winter_Sun", "duration_ms": 2000},
+        "transition_to_next": {"type": "Dollar_Bills_II", "duration_ms": 1500},
+        "background_fill": {"type": "blur", "intensity": 0.375}
       }
     ],
+
     "audios": [
       {
-        "source": "F:/Audio/background_music.mp3",
+        "timeline_priority": 1,
+        "source": "C:/Users/VINH/Music/SunoDownloads/background_music.mp3",
         "start_ms": 0,
+        "start_trim_ms": 0,
         "duration_ms": null,
-        "volume": 0.4,
+        "volume": 0.5,
+        "speed": 1.0,
         "fade_in_ms": 2000,
-        "fade_out_ms": 3000
+        "fade_out_ms": 3000,
+        "effects": [
+          {
+            "type": "变声_男变女",
+            "params": [50, 30]
+          }
+        ],
+        "keyframes": [
+          {
+            "time_offset_ms": 0,
+            "volume": 0.5
+          },
+          {
+            "time_offset_ms": 5000,
+            "volume": 1.0
+          },
+          {
+            "time_offset_ms": 25000,
+            "volume": 0.3
+          }
+        ]
       }
     ],
+
     "effects": [
       {
-        "type": "Gold_Sparkles",
+        "timeline_priority": 3,
+        "type": "Twinkle_Dust",
         "category": "scene",
         "start_ms": 0,
-        "duration_ms": 5000
+        "duration_ms": 15000,
+        "params": [80, 60, 40]
+      },
+      {
+        "timeline_priority": 3,
+        "type": "Blur_Face",
+        "category": "character",
+        "start_ms": 0,
+        "duration_ms": 10000,
+        "params": [100]
       }
     ],
+
     "filters": [
       {
-        "type": "BW_2",
+        "timeline_priority": 4,
+        "type": "Hasselblad",
         "start_ms": 0,
-        "duration_ms": 15000,
-        "intensity": 30
+        "duration_ms": 6000,
+        "intensity": 50
+      },
+      {
+        "timeline_priority": 4,
+        "type": "Quality_ll",
+        "start_ms": 6000,
+        "duration_ms": 6000,
+        "intensity": 50
+      },
+      {
+        "timeline_priority": 4,
+        "type": "Past_Fame",
+        "start_ms": 12000,
+        "duration_ms": 6000,
+        "intensity": 50
+      },
+      {
+        "timeline_priority": 4,
+        "type": "Vintage_Copper",
+        "start_ms": 18000,
+        "duration_ms": 6000,
+        "intensity": 50
+      },
+      {
+        "timeline_priority": 4,
+        "type": "_4K",
+        "start_ms": 24000,
+        "duration_ms": 6000,
+        "intensity": 50
       }
     ],
+
     "images": [
       {
-        "source": "F:/Images/logo.png",
+        "timeline_priority": 5,
+        "source": "C:/Users/VINH/Pictures/logo.png",
         "start_ms": 0,
-        "duration_ms": 5000,
-        "position": { "x": 0.7, "y": -0.8 },
-        "scale": 0.15
+        "duration_ms": 30000,
+        "position": {
+          "x": 0.4,
+          "y": -0.4
+        },
+        "scale": 0.2,
+        "scale_x": null,
+        "scale_y": null,
+        "rotation": 0,
+        "alpha": 0.8,
+        "flip_horizontal": false,
+        "flip_vertical": false,
+        "intro_animation": {
+          "type": "渐显",
+          "duration_ms": 500
+        },
+        "outro_animation": {
+          "type": "渐隐",
+          "duration_ms": 500
+        },
+        "keyframes": [
+          {
+            "time_offset_ms": 0,
+            "property": "alpha",
+            "value": 0.8
+          },
+          {
+            "time_offset_ms": 15000,
+            "property": "alpha",
+            "value": 1.0
+          }
+        ]
       }
     ],
+
+    "stickers": [
+      {
+        "timeline_priority": 5,
+        "type": "pngtree_animated_shocked_emoji_with_hand",
+        "start_ms": 0,
+        "duration_ms": 10000,
+        "position": {
+          "x": 0.35,
+          "y": -0.35
+        },
+        "scale": 0.5
+      },
+      {
+        "timeline_priority": 5,
+        "type": "CELEBRATION_EN_BIRTHDAY_CAKE_CANDLE",
+        "start_ms": 10000,
+        "duration_ms": 10000,
+        "position": {
+          "x": -0.35,
+          "y": -0.35
+        },
+        "scale": 0.5
+      },
+      {
+        "timeline_priority": 5,
+        "type": "Social_Media___E_Commerce_Stickers_EN",
+        "start_ms": 20000,
+        "duration_ms": 10000,
+        "position": {
+          "x": 0,
+          "y": 0.35
+        },
+        "scale": 0.6
+      }
+    ],
+
     "texts": [
       {
-        "content": "WELCOME! 🎉",
+        "timeline_priority": 6,
+        "content": "FULL STYLED TEXT",
         "start_ms": 500,
         "duration_ms": 4000,
-        "position": { "x": 0, "y": -0.3 },
-        "style": { "font": "Source_Han_Serif", "size": 12, "color": "#FFFFFF", "bold": true },
-        "border": { "color": "#FF0000", "width": 50 },
-        "shadow": { "color": "#000000", "alpha": 0.9, "distance": 8 },
-        "animation": { 
-          "intro": { "type": "放大", "duration_ms": 500 }, 
-          "loop": { "type": "闪烁" }, 
-          "outro": { "type": "渐隐", "duration_ms": 300 } 
+        "position": {
+          "x": 0,
+          "y": -0.3
+        },
+        "style": {
+          "font": "Sriracha_Rg",
+          "size": 10,
+          "color": "#FFFFFF",
+          "alpha": 1.0,
+          "bold": true,
+          "italic": false,
+          "underline": false,
+          "vertical": false,
+          "align": 1,
+          "letter_spacing": 0,
+          "line_spacing": 0,
+          "auto_wrapping": false,
+          "max_line_width": 0.82
+        },
+        "border": {
+          "color": "#000000",
+          "width": 40,
+          "alpha": 1.0
+        },
+        "shadow": {
+          "color": "#000000",
+          "alpha": 0.8,
+          "distance": 5,
+          "diffuse": 15,
+          "angle": -45
+        },
+        "background": {
+          "color": "#FF0000",
+          "alpha": 0.5,
+          "style": 1,
+          "round_radius": 0.1,
+          "height": 0.14,
+          "width": 0.5,
+          "horizontal_offset": 0.5,
+          "vertical_offset": 0.5
+        },
+        "animation": {
+          "intro": {
+            "type": "Karaoke",
+            "duration_ms": 500
+          },
+          "loop": {
+            "type": "Burning_Fuzz",
+            "duration_ms": null
+          },
+          "outro": {
+            "type": "Flea_Jumping",
+            "duration_ms": 500
+          }
+        }
+      },
+      {
+        "content": "SIMPLE TEXT",
+        "start_ms": 6000,
+        "duration_ms": 6000,
+        "position": {"x": 0, "y": 0},
+        "style": {"font": "Sriracha_Rg", "size": 10, "color": "#FFD700", "bold": true, "align": 1},
+        "animation": {"intro": {"type": "Butterfly_Double", "duration_ms": 500}, "loop": {"type": "Steady_Pulse"}}
+      },
+      {
+        "content": "TEXT WITH OUTRO",
+        "start_ms": 14000,
+        "duration_ms": 5000,
+        "position": {"x": 0, "y": 0.3},
+        "style": {"font": "Sriracha_Rg", "size": 10, "color": "#FF00FF", "bold": true, "align": 1},
+        "animation": {"intro": {"type": "Karaoke", "duration_ms": 500}, "outro": {"type": "Flash_Scatter", "duration_ms": 500}}
+      },
+      {
+        "content": "ALL ANIMATIONS",
+        "start_ms": 20000,
+        "duration_ms": 8000,
+        "position": {"x": 0, "y": -0.5},
+        "style": {"font": "Thasadith_Bd", "size": 10, "color": "#00FF00", "bold": true, "align": 1},
+        "animation": {
+          "intro": {"type": "Butterfly_Double", "duration_ms": 500},
+          "loop": {"type": "Steady_Pulse"},
+          "outro": {"type": "Flash_Scatter", "duration_ms": 500}
         }
       }
     ]
   }'
 
-# 📋 CHI TIẾT THAM SỐ
 
-# ═══════════════════════════════════════════════════════════════════════════════
+# ====================================================================================================
+# 📋 COMPLETE JSON SCHEMA REFERENCE
+# ====================================================================================================
+
+
+# ==========================================
 # canvas_config (BẮT BUỘC)
-# ═══════════════════════════════════════════════════════════════════════════════
-# | Tham số     | Kiểu | Bắt buộc? | Default | Mô tả                           |
-# | width       | int  | ✅ CÓ     | -       | Chiều rộng video (pixels)       |
-# | height      | int  | ✅ CÓ     | -       | Chiều cao video (pixels)        |
-# | fps         | int  | ❌ KHÔNG  | 30      | Frame rate                      |
-# | duration_ms | int  | ❌ KHÔNG  | auto    | Thời lượng tổng (auto từ video) |
+# ==========================================
+# {
+#   "width": int,              // ✅ REQUIRED - Video width in pixels
+#   "height": int,             // ✅ REQUIRED - Video height in pixels
+#   "fps": int,                // Default: 30 - Frames per second
+#   "duration_ms": int|null    // Default: null - Total duration (auto if null)
+# }
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# video_sequence (BẮT BUỘC - phải có ít nhất 1 video)
-# ═══════════════════════════════════════════════════════════════════════════════
-# | Tham số           | Kiểu   | Bắt buộc? | Default | Mô tả                        |
-# | source            | string | ✅ CÓ     | -       | Đường dẫn file video         |
-# | timeline_priority | int    | ❌ KHÔNG  | 2       | Thứ tự render                |
-# | start_trim_ms     | int    | ❌ KHÔNG  | 0       | Cắt từ đầu source (ms)       |
-# | duration_ms       | int    | ❌ KHÔNG  | full    | Thời lượng (ms)              |
-# | volume            | float  | ❌ KHÔNG  | 1.0     | Âm lượng (0-1)               |
-# | speed             | float  | ❌ KHÔNG  | 1.0     | Tốc độ phát                  |
-# | transform         | object | ❌ KHÔNG  | default | x, y, scale_x, scale_y, etc. |
-# | intro_animation   | object | ❌ KHÔNG  | null    | {type, duration_ms}          |
-# | outro_animation   | object | ❌ KHÔNG  | null    | {type, duration_ms}          |
-# | transition_to_next| object | ❌ KHÔNG  | null    | {type, duration_ms}          |
-# | background_fill   | object | ❌ KHÔNG  | null    | {type, intensity, color}     |
-# | mask              | object | ❌ KHÔNG  | null    | {type, size, feather, invert}|
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# audios (TÙY CHỌN - nếu không gửi sẽ mặc định là [])
-# ═══════════════════════════════════════════════════════════════════════════════
-# | Tham số      | Kiểu   | Bắt buộc? | Default | Mô tả                    |
-# | source       | string | ✅ CÓ     | -       | Đường dẫn file audio     |
-# | start_ms     | int    | ❌ KHÔNG  | 0       | Vị trí trên timeline     |
-# | duration_ms  | int    | ❌ KHÔNG  | full    | Thời lượng               |
-# | volume       | float  | ❌ KHÔNG  | 1.0     | Âm lượng (0-1)           |
-# | fade_in_ms   | int    | ❌ KHÔNG  | 0       | Fade in (ms)             |
-# | fade_out_ms  | int    | ❌ KHÔNG  | 0       | Fade out (ms)            |
+# ==========================================
+# video_sequence[] (BẮT BUỘC - ít nhất 1)
+# ==========================================
+# {
+#   "timeline_priority": int,           // Default: 2 - Render order
+#   "source": string,                   // ✅ REQUIRED - Video file path
+#   "start_trim_ms": int,               // Default: 0 - Trim from source start
+#   "duration_ms": int|null,            // Default: null - Duration (null = full video)
+#   "volume": float,                    // Default: 1.0 - Audio volume (0-1)
+#   "speed": float,                     // Default: 1.0 - Playback speed
+#   "transform": Transform|null,        // Default: null - Transform settings
+#   "intro_animation": AnimationConfig, // Default: null - Intro animation
+#   "outro_animation": AnimationConfig, // Default: null - Outro animation
+#   "transition_to_next": AnimationConfig, // Default: null - Transition to next video
+#   "background_fill": BackgroundFill,  // Default: null - Background fill
+#   "mask": Mask|null,                  // Default: null - Mask settings
+#   "keyframes": Keyframe[],            // Default: [] - Animation keyframes
+#   "effects": VideoEffectItem[]        // Default: [] - Per-video effects (applies only during this video's duration)
+# }
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# effects (TÙY CHỌN - nếu không gửi sẽ mặc định là [])
-# ═══════════════════════════════════════════════════════════════════════════════
-# | Tham số     | Kiểu   | Bắt buộc? | Default | Mô tả                        |
-# | type        | string | ✅ CÓ     | -       | Tên effect (từ /get_*)       |
-# | duration_ms | int    | ✅ CÓ     | -       | Thời lượng effect            |
-# | category    | string | ❌ KHÔNG  | scene   | scene hoặc character         |
-# | start_ms    | int    | ❌ KHÔNG  | 0       | Thời điểm bắt đầu            |
+# VideoEffectItem object (per-video effect):
+# {
+#   "type": string,               // ✅ REQUIRED - Effect type from video_scene_effect.py
+#   "category": string,           // Default: "scene" - "scene" or "character"
+#   "start_offset_ms": int,       // Default: 0 - Start offset from video start (0 = effect starts when video starts)
+#   "duration_ms": int|null,      // Default: null - Effect duration (null = lasts for video's remaining duration)
+#   "params": float[]|null        // Effect parameters [0-100, ...]
+# }
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# filters (TÙY CHỌN - nếu không gửi sẽ mặc định là [])
-# ═══════════════════════════════════════════════════════════════════════════════
-# | Tham số     | Kiểu   | Bắt buộc? | Default | Mô tả                        |
-# | type        | string | ✅ CÓ     | -       | Tên filter (từ /get_filter_types) |
-# | duration_ms | int    | ✅ CÓ     | -       | Thời lượng filter            |
-# | start_ms    | int    | ❌ KHÔNG  | 0       | Thời điểm bắt đầu            |
-# | intensity   | float  | ❌ KHÔNG  | 100     | Cường độ (0-100)             |
+# Transform object:
+# {
+#   "x": float,                // Default: 0 - Horizontal position (-1 to 1)
+#   "y": float,                // Default: 0 - Vertical position (-1 to 1)
+#   "scale_x": float,          // Default: 1.0 - Horizontal scale
+#   "scale_y": float,          // Default: 1.0 - Vertical scale
+#   "rotation": float,         // Default: 0 - Rotation in degrees (clockwise)
+#   "alpha": float,            // Default: 1.0 - Opacity (0-1)
+#   "flip_horizontal": bool,   // Default: false
+#   "flip_vertical": bool      // Default: false
+# }
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# images (TÙY CHỌN - nếu không gửi sẽ mặc định là [])
-# ═══════════════════════════════════════════════════════════════════════════════
-# | Tham số     | Kiểu   | Bắt buộc? | Default | Mô tả                        |
-# | source      | string | ✅ CÓ     | -       | Đường dẫn file image         |
-# | start_ms    | int    | ❌ KHÔNG  | 0       | Thời điểm bắt đầu            |
-# | duration_ms | int    | ❌ KHÔNG  | 3000    | Thời lượng hiển thị          |
-# | position    | object | ❌ KHÔNG  | {0,0}   | {x, y} vị trí (-1 to 1)      |
-# | scale       | float  | ❌ KHÔNG  | 1.0     | Tỷ lệ scale                  |
+# AnimationConfig object:
+# {
+#   "type": string,            // ✅ REQUIRED - Animation type name
+#   "duration_ms": int|null    // Default: null - Duration (null for default)
+# }
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# texts (TÙY CHỌN - nếu không gửi sẽ mặc định là [])
-# ═══════════════════════════════════════════════════════════════════════════════
-# | Tham số     | Kiểu   | Bắt buộc? | Default | Mô tả                        |
-# | content     | string | ✅ CÓ     | -       | Nội dung text                |
-# | duration_ms | int    | ✅ CÓ     | -       | Thời lượng hiển thị          |
-# | start_ms    | int    | ❌ KHÔNG  | 0       | Thời điểm bắt đầu            |
-# | position    | object | ❌ KHÔNG  | {0,0}   | {x, y} vị trí                |
-# | style       | object | ❌ KHÔNG  | default | font, size, color, bold, etc.|
-# | border      | object | ❌ KHÔNG  | null    | color, width, alpha          |
-# | shadow      | object | ❌ KHÔNG  | null    | color, alpha, distance, etc. |
-# | animation   | object | ❌ KHÔNG  | null    | intro, loop, outro           |
+# BackgroundFill object:
+# {
+#   "type": string,            // ✅ REQUIRED - "blur" or "color"
+#   "intensity": float,        // Default: 0.375 - Blur intensity (0.0625, 0.375, 0.75, 1.0)
+#   "color": string            // Default: "#000000FF" - Color in #RRGGBBAA format
+# }
 
-# 📋 Response thành công (200)
+# Mask object:
+# {
+#   "type": string,            // ✅ REQUIRED - Mask type (圆形, 矩形, 爱心, 镜面, 星形)
+#   "center_x": float,         // Default: 0 - Center X in pixels
+#   "center_y": float,         // Default: 0 - Center Y in pixels
+#   "size": float,             // Default: 0.5 - Size ratio of height (0-1)
+#   "rotation": float,         // Default: 0 - Rotation in degrees
+#   "feather": float,          // Default: 0 - Feather amount (0-100)
+#   "invert": bool,            // Default: false - Invert mask
+#   "rect_width": float|null,  // Default: null - Rectangle width (矩形 only)
+#   "round_corner": float|null // Default: null - Round corner (矩形 only, 0-100)
+# }
+
+# Keyframe object:
+# {
+#   "time_offset_ms": int,     // ✅ REQUIRED - Time offset from segment start
+#   "property": string|null,   // Property name: "scale_x", "scale_y", "rotation", "alpha"
+#   "value": float|null,       // Property value
+#   "volume": float|null       // Volume value (for audio keyframes)
+# }
+
+
+# ==========================================
+# audios[] (TÙY CHỌN)
+# ==========================================
+# {
+#   "timeline_priority": int,     // Default: 1 - Render order
+#   "source": string,             // ✅ REQUIRED - Audio file path
+#   "start_ms": int,              // Default: 0 - Position on timeline
+#   "start_trim_ms": int,         // Default: 0 - Trim from source start
+#   "duration_ms": int|null,      // Default: null - Duration (null = full audio)
+#   "volume": float,              // Default: 1.0 - Volume (0-1)
+#   "speed": float,               // Default: 1.0 - Playback speed
+#   "fade_in_ms": int,            // Default: 0 - Fade in duration
+#   "fade_out_ms": int,           // Default: 0 - Fade out duration
+#   "effects": AudioEffect[],     // Default: [] - Audio effects
+#   "keyframes": Keyframe[]       // Default: [] - Volume keyframes
+# }
+
+# AudioEffect object:
+# {
+#   "type": string,               // ✅ REQUIRED - Effect type from audio_scene_effect.py
+#   "params": float[]|null        // Effect parameters [0-100, ...]
+# }
+
+
+# ==========================================
+# effects[] (TÙY CHỌN)
+# ==========================================
+# {
+#   "timeline_priority": int,     // Default: 3 - Render order
+#   "type": string,               // ✅ REQUIRED - Effect type from video_scene_effect.py
+#   "category": string,           // Default: "scene" - "scene" or "character"
+#   "start_ms": int,              // Default: 0 - Start time on timeline
+#   "duration_ms": int,           // ✅ REQUIRED - Effect duration
+#   "params": float[]|null        // Effect parameters [0-100, ...]
+# }
+
+
+# ==========================================
+# filters[] (TÙY CHỌN)
+# ==========================================
+# {
+#   "timeline_priority": int,     // Default: 4 - Render order
+#   "type": string,               // ✅ REQUIRED - Filter type from filter_meta.py
+#   "start_ms": int,              // Default: 0 - Start time on timeline
+#   "duration_ms": int,           // ✅ REQUIRED - Filter duration
+#   "intensity": float            // Default: 100 - Filter intensity (0-100)
+# }
+
+
+# ==========================================
+# images[] (TÙY CHỌN)
+# ==========================================
+# {
+#   "timeline_priority": int,      // Default: 5 - Render order
+#   "source": string,              // ✅ REQUIRED - Image file path
+#   "start_ms": int,               // Default: 0 - Start time on timeline
+#   "duration_ms": int,            // Default: 3000 - Display duration
+#   "position": Position,          // Default: {x:0, y:0} - Position on canvas
+#   "scale": float,                // Default: 1.0 - Uniform scale
+#   "scale_x": float|null,         // Horizontal scale (overrides scale)
+#   "scale_y": float|null,         // Vertical scale (overrides scale)
+#   "rotation": float,             // Default: 0 - Rotation in degrees
+#   "alpha": float,                // Default: 1.0 - Opacity (0-1)
+#   "flip_horizontal": bool,       // Default: false
+#   "flip_vertical": bool,         // Default: false
+#   "intro_animation": AnimationConfig, // Intro animation
+#   "outro_animation": AnimationConfig, // Outro animation
+#   "keyframes": Keyframe[]        // Animation keyframes
+# }
+
+# Position object:
+# {
+#   "x": float,    // Default: 0 - Horizontal position (-1 to 1)
+#   "y": float     // Default: 0 - Vertical position (-1 to 1)
+# }
+
+
+# ==========================================
+# stickers[] (TÙY CHỌN)
+# ==========================================
+# {
+#   "timeline_priority": int,     // Default: 5 - Render order
+#   "type": string,               // ✅ REQUIRED - Sticker type from sticker_meta.py
+#   "start_ms": int,              // Default: 0 - Start time on timeline
+#   "duration_ms": int,           // ✅ REQUIRED - Display duration
+#   "position": Position,         // Default: {x:0, y:0} - Position on canvas (-1 to 1)
+#   "scale": float                // Default: 1.0 - Sticker scale
+# }
+
+
+# ==========================================
+# texts[] (TÙY CHỌN)
+# ==========================================
+# {
+#   "timeline_priority": int,     // Default: 6 - Render order (top layer)
+#   "content": string,            // ✅ REQUIRED - Text content
+#   "start_ms": int,              // Default: 0 - Start time on timeline
+#   "duration_ms": int,           // ✅ REQUIRED - Display duration
+#   "position": Position,         // Default: {x:0, y:0} - Position on canvas
+#   "style": TextStyle,           // Text styling
+#   "border": TextBorder|null,    // Text border/stroke
+#   "shadow": TextShadow|null,    // Text shadow
+#   "background": TextBackground, // Text background
+#   "animation": Animations       // Text animations
+# }
+
+# TextStyle object:
+# {
+#   "font": string|null,          // Font type from font_meta.py
+#   "size": float,                // Default: 8.0 - Font size
+#   "color": string,              // Default: "#FFFFFF" - Text color #RRGGBB
+#   "alpha": float,               // Default: 1.0 - Opacity (0-1)
+#   "bold": bool,                 // Default: false
+#   "italic": bool,               // Default: false
+#   "underline": bool,            // Default: false
+#   "vertical": bool,             // Default: false - Vertical text layout
+#   "align": int,                 // Default: 1 - 0=left, 1=center, 2=right
+#   "letter_spacing": float,      // Default: 0
+#   "line_spacing": float,        // Default: 0
+#   "auto_wrapping": bool,        // Default: false
+#   "max_line_width": float       // Default: 0.82 - Max line width ratio (0-1)
+# }
+
+# TextBorder object:
+# {
+#   "color": string,              // Default: "#000000" - Border color
+#   "width": float,               // Default: 40 - Border width (0-100)
+#   "alpha": float                // Default: 1.0 - Opacity (0-1)
+# }
+
+# TextShadow object:
+# {
+#   "color": string,              // Default: "#000000" - Shadow color
+#   "alpha": float,               // Default: 1.0 - Opacity (0-1)
+#   "distance": float,            // Default: 5 - Distance (0-100)
+#   "diffuse": float,             // Default: 15 - Blur (0-100)
+#   "angle": float                // Default: -45 - Angle (-180 to 180)
+# }
+
+# TextBackground object:
+# {
+#   "color": string,              // ✅ REQUIRED - Background color #RRGGBB
+#   "alpha": float,               // Default: 1.0 - Opacity (0-1)
+#   "style": int,                 // Default: 1 - Style (1 or 2)
+#   "round_radius": float,        // Default: 0 - Corner radius (0-1)
+#   "height": float,              // Default: 0.14 - Height (0-1)
+#   "width": float,               // Default: 0.14 - Width (0-1)
+#   "horizontal_offset": float,   // Default: 0.5 - Horizontal offset (0-1)
+#   "vertical_offset": float      // Default: 0.5 - Vertical offset (0-1)
+# }
+
+# Animations object:
+# {
+#   "intro": AnimationConfig|null,   // Intro animation
+#   "loop": AnimationConfig|null,    // Loop animation
+#   "outro": AnimationConfig|null    // Outro animation
+# }
+
+
+# ====================================================================================================
+# 📋 ANIMATION TYPES REFERENCE
+# ====================================================================================================
+
+# Video Intro Animations (intro_animation.type):
+# Winter_Sun, Magic_Burst, Fade_In, Zoom_In, Slide_Left, Slide_Right, Slide_Up, Slide_Down,
+# Rotate_In, Blur_In, Flash_In, Bounce_In, 渐显, ...
+# (Xem video_intro.py để biết đầy đủ)
+
+# Video Outro Animations (outro_animation.type):
+# Layers, Blurred_Fade_in, Fade_Out, Zoom_Out, Slide_Left, Slide_Right, Slide_Up, Slide_Down,
+# Rotate_Out, Blur_Out, Flash_Out, 渐隐, ...
+# (Xem video_outro.py để biết đầy đủ)
+
+# Transition Types (transition_to_next.type):
+# Train, Star_Screen, Dollar_Bills_II, White_Flash, Whirl, Fade, Dissolve, Wipe_Left,
+# Wipe_Right, Zoom_In, Zoom_Out, Split_off_Cube, ...
+# (Xem transition_meta.py để biết đầy đủ - 1140+ transitions)
+
+# Text Intro Animations:
+# Karaoke, Butterfly_Double, Typewriter, Fade_In, Zoom_In, Bounce_In, Pop_Up, ...
+# (Xem text_intro.py để biết đầy đủ)
+
+# Text Loop Animations:
+# Burning_Fuzz, Steady_Pulse, Heartbeat, Wave_3, Shine, Flare, Tremble, ...
+# (Xem text_loop.py để biết đầy đủ)
+
+# Text Outro Animations:
+# Flea_Jumping, Flash_Scatter, Fade_Out, Zoom_Out, Bounce_Out, Pop_Down, ...
+# (Xem text_outro.py để biết đầy đủ)
+
+
+# ====================================================================================================
+# 📋 STICKER TYPES REFERENCE
+# ====================================================================================================
+
+# Available stickers from sticker_meta.py:
+# Pets_EN___Cute_Cat, _2109, 牛13, Comic_EN_Speech_Bubble, 光るダブルスター,
+# pngtree_animated_shocked_emoji_with_hand, CELEBRATION_EN_BIRTHDAY_CAKE_CANDLE,
+# Social_Media___E_Commerce_Stickers_EN
+# (Sync thêm stickers bằng cách chạy Vinh_add_efffect_to_file.py)
+
+
+# ====================================================================================================
+# 📋 FILTER TYPES REFERENCE
+# ====================================================================================================
+
+# Filters from filter_meta.py:
+# Hasselblad, Quality_ll, Past_Fame, Vintage_Copper, _4K, Film_Grain, Retro, Warm, Cool,
+# Black_White, Sepia, Vibrant, Soft, Dramatic, ...
+# (Xem filter_meta.py để biết đầy đủ)
+
+
+# ====================================================================================================
+# 📋 RESPONSE FORMAT
+# ====================================================================================================
+
+# Success Response (200):
 # {
 #   "success": true,
 #   "output": {
-#     "draft_id": "abc123",
+#     "draft_id": "abc123...",
 #     "draft_name": "project_abc123",
-#     "draft_folder": "C:\\Users\\...\\CapCut\\...",
+#     "draft_folder": "C:/Users/.../CapCut/...",
 #     "canvas": {"width": 1080, "height": 1920, "fps": 30},
 #     "processing_results": {
-#       "video_sequence": {"count": 1, "status": "..."},
-#       "audios": {"count": 0, "status": "..."},
-#       ...
+#       "video_sequence": {"count": 3, "status": "completed"},
+#       "audios": {"count": 1, "status": "completed"},
+#       "effects": {"count": 2, "status": "completed"},
+#       "filters": {"count": 5, "status": "completed"},
+#       "images": {"count": 1, "status": "completed"},
+#       "stickers": {"count": 3, "status": "completed"},
+#       "texts": {"count": 4, "status": "completed"}
 #     }
 #   },
 #   "error": ""
 # }
 
-# 📋 Response lỗi validation (400)
+# Error Response (400):
 # {
 #   "success": false,
 #   "output": "",
-#   "error": "Validation failed: video_sequence: video_sequence is required and must contain at least 1 video item"
+#   "error": "Validation error: video_sequence is required and must contain at least 1 video item"
 # }
-
-
-# ====================================================================================================
-# 📁 DRAFT MANAGEMENT ENDPOINTS
-# ====================================================================================================
-
-
-# ----------------------------------------------------------------------------------------------------
-# 📁 API: Tạo Draft Mới (`/create_draft`)
-# ----------------------------------------------------------------------------------------------------
-# API này tạo một draft CapCut mới và trả về draft_id để sử dụng cho các API khác.
-
-# 🔌 Endpoint Info
-# | Method | URL                             |
-# | POST   | http://localhost:8000/create_draft |
-
-# 💻 cURL Request (Full Options)
-curl -X POST http://localhost:8000/create_draft \
-  -H "Content-Type: application/json" \
-  -d '{
-    "draft_name": "my_video_project",
-    "width": 1920,
-    "height": 1080,
-    "fps": 30,
-    "draft_folder": "C:\\Users\\VINH\\AppData\\Local\\CapCut\\User Data\\Projects\\com.lveditor.draft"
-  }'
-
-# 📋 Chi Tiết Tham Số
-# 🟡 OPTIONAL (tất cả đều có default)
-# | Tham số      | Default         | Mô tả                                          |
-# | draft_name   | auto-generated  | Tên draft (folder name).                       |
-# | width        | 1920            | Chiều rộng video (pixels).                     |
-# | height       | 1080            | Chiều cao video (pixels).                      |
-# | fps          | 30              | Frame rate.                                    |
-# | draft_folder | từ config.json  | Đường dẫn đến folder chứa drafts của CapCut.   |
-
-
-# ----------------------------------------------------------------------------------------------------
-# 💾 API: Lưu Draft (`/save_draft`)
-# ----------------------------------------------------------------------------------------------------
-# API này lưu draft hiện tại ra file để có thể mở trong CapCut.
-
-# 🔌 Endpoint Info
-# | Method | URL                            |
-# | POST   | http://localhost:8000/save_draft |
-
-# 💻 cURL Request
-curl -X POST http://localhost:8000/save_draft \
-  -H "Content-Type: application/json" \
-  -d '{
-    "draft_id": "YOUR_DRAFT_ID"
-  }'
-
-# 📋 Chi Tiết Tham Số
-# 🔴 BẮT BUỘC (Required)
-# | Tham số  | Kiểu   | Mô tả                  |
-# | draft_id | string | ID draft cần lưu.      |
-
-
-# ----------------------------------------------------------------------------------------------------
-# 🗑️ API: Xóa Draft (`/delete_draft`)
-# ----------------------------------------------------------------------------------------------------
-# API này xóa draft khỏi cache memory.
-
-# 🔌 Endpoint Info
-# | Method | URL                              |
-# | POST   | http://localhost:8000/delete_draft |
-
-# 💻 cURL Request
-curl -X POST http://localhost:8000/delete_draft \
-  -H "Content-Type: application/json" \
-  -d '{
-    "draft_id": "YOUR_DRAFT_ID"
-  }'
-
-# 📋 Chi Tiết Tham Số
-# 🔴 BẮT BUỘC (Required)
-# | Tham số  | Kiểu   | Mô tả                  |
-# | draft_id | string | ID draft cần xóa.      |
-
-
-# ----------------------------------------------------------------------------------------------------
-# ℹ️ API: Thông Tin Draft (`/get_draft_info`)
-# ----------------------------------------------------------------------------------------------------
-# API này lấy thông tin chi tiết về draft.
-
-# 🔌 Endpoint Info
-# | Method | URL                                |
-# | POST   | http://localhost:8000/get_draft_info |
-
-# 💻 cURL Request
-curl -X POST http://localhost:8000/get_draft_info \
-  -H "Content-Type: application/json" \
-  -d '{
-    "draft_id": "YOUR_DRAFT_ID"
-  }'
-
-# 📋 Response mẫu
-# {
-#   "success": true,
-#   "output": {
-#     "draft_id": "abc123",
-#     "draft_name": "my_project",
-#     "width": 1920,
-#     "height": 1080,
-#     "fps": 30,
-#     "duration": 10.5,
-#     "tracks": {
-#       "video": {"type": "video", "segments": 2},
-#       "audio": {"type": "audio", "segments": 1}
-#     }
-#   }
-# }
-
-
-# ----------------------------------------------------------------------------------------------------
-# 📋 API: Liệt kê Drafts (`/list_drafts`)
-# ----------------------------------------------------------------------------------------------------
-# API này liệt kê tất cả các draft đang được cache trong memory.
-
-# 🔌 Endpoint Info
-# | Method | URL                             |
-# | GET    | http://localhost:8000/list_drafts |
-
-# 💻 cURL Request
-curl -X GET http://localhost:8000/list_drafts
-
-
-# ====================================================================================================
-# 🎬 MEDIA ENDPOINTS
-# ====================================================================================================
-
-
-# ----------------------------------------------------------------------------------------------------
-# 🎬 API: Thêm Video (`/add_video`)
-# ----------------------------------------------------------------------------------------------------
-# API này thêm một video segment vào draft.
-
-# 🔌 Endpoint Info
-# | Method | URL                          |
-# | POST   | http://localhost:8000/add_video |
-
-# 💻 cURL Request (Full Options)
-curl -X POST http://localhost:8000/add_video \
-  -H "Content-Type: application/json" \
-  -d '{
-    "draft_id": "YOUR_DRAFT_ID",
-    "video_path": "F:\\Videos\\my_video.mp4",
-    "start": 0,
-    "duration": 10,
-    "target_start": 0,
-    "transform_x": 0,
-    "transform_y": 0,
-    "scale_x": 1,
-    "scale_y": 1,
-    "volume": 1.0,
-    "speed": 1.0,
-    "track_name": null
-  }'
-
-# 📋 Chi Tiết Tham Số
-# 🔴 BẮT BUỘC (Required)
-# | Tham số    | Kiểu   | Mô tả                                      |
-# | draft_id   | string | ID draft từ /create_draft.                 |
-# | video_path | string | Đường dẫn file video local.                |
-
-# 🟡 TIMING
-# | Tham số      | Default     | Mô tả                                    |
-# | start        | 0           | Thời điểm cắt từ source (giây).          |
-# | duration     | full video  | Thời lượng segment (giây).               |
-# | target_start | 0           | Vị trí trên timeline (giây).             |
-
-# 🟢 TRANSFORM
-# | Tham số     | Default | Mô tả                            |
-# | transform_x | 0       | Vị trí ngang (-1.0 ↔ 1.0).       |
-# | transform_y | 0       | Vị trí dọc (-1.0 ↔ 1.0).         |
-# | scale_x     | 1       | Tỷ lệ ngang.                     |
-# | scale_y     | 1       | Tỷ lệ dọc.                       |
-
-# 🔵 AUDIO/SPEED
-# | Tham số | Default | Mô tả                    |
-# | volume  | 1.0     | Âm lượng (0.0-1.0).      |
-# | speed   | 1.0     | Tốc độ phát (0.1-100).   |
-
-
-# ----------------------------------------------------------------------------------------------------
-# 🖼️ API: Thêm Image (`/add_image`)
-# ----------------------------------------------------------------------------------------------------
-# API này thêm một hình ảnh/GIF vào draft.
-
-# 🔌 Endpoint Info
-# | Method | URL                           |
-# | POST   | http://localhost:8000/add_image |
-
-# 💻 cURL Request (Full Options)
-curl -X POST http://localhost:8000/add_image \
-  -H "Content-Type: application/json" \
-  -d '{
-    "draft_id": "YOUR_DRAFT_ID",
-    "image_path": "F:\\Images\\my_image.png",
-    "start": 0,
-    "duration": 3.0,
-    "transform_x": 0,
-    "transform_y": 0,
-    "scale_x": 1,
-    "scale_y": 1,
-    "track_name": null
-  }'
-
-# 📋 Chi Tiết Tham Số
-# 🔴 BẮT BUỘC (Required)
-# | Tham số    | Kiểu   | Mô tả                          |
-# | draft_id   | string | ID draft từ /create_draft.     |
-# | image_path | string | Đường dẫn file image local.    |
-
-# 🟡 TIMING
-# | Tham số  | Default | Mô tả                              |
-# | start    | 0       | Vị trí trên timeline (giây).       |
-# | duration | 3.0     | Thời lượng hiển thị (giây).        |
-
-
-# ----------------------------------------------------------------------------------------------------
-# 🎵 API: Thêm Audio (`/add_audio`)
-# ----------------------------------------------------------------------------------------------------
-# API này thêm một audio segment vào draft.
-
-# 🔌 Endpoint Info
-# | Method | URL                           |
-# | POST   | http://localhost:8000/add_audio |
-
-# 💻 cURL Request (Full Options)
-curl -X POST http://localhost:8000/add_audio \
-  -H "Content-Type: application/json" \
-  -d '{
-    "draft_id": "YOUR_DRAFT_ID",
-    "audio_path": "F:\\Audio\\background_music.mp3",
-    "start": 0,
-    "duration": null,
-    "target_start": 0,
-    "volume": 0.8,
-    "speed": 1.0,
-    "track_name": null
-  }'
-
-# 📋 Chi Tiết Tham Số
-# 🔴 BẮT BUỘC (Required)
-# | Tham số    | Kiểu   | Mô tả                          |
-# | draft_id   | string | ID draft từ /create_draft.     |
-# | audio_path | string | Đường dẫn file audio local.    |
-
-# 🟡 TIMING
-# | Tham số      | Default    | Mô tả                              |
-# | start        | 0          | Thời điểm cắt từ source (giây).    |
-# | duration     | full audio | Thời lượng segment (giây).         |
-# | target_start | 0          | Vị trí trên timeline (giây).       |
-
-# 🟢 AUDIO
-# | Tham số | Default | Mô tả                    |
-# | volume  | 1.0     | Âm lượng (0.0-1.0).      |
-# | speed   | 1.0     | Tốc độ phát (0.1-100).   |
-
-
-# ----------------------------------------------------------------------------------------------------
-# 🎨 API: Thêm Sticker (`/add_sticker`)
-# ----------------------------------------------------------------------------------------------------
-# API này thêm một sticker vào draft.
-
-# 🔌 Endpoint Info
-# | Method | URL                             |
-# | POST   | http://localhost:8000/add_sticker |
-
-# 💻 cURL Request (Full Options)
-curl -X POST http://localhost:8000/add_sticker \
-  -H "Content-Type: application/json" \
-  -d '{
-    "draft_id": "YOUR_DRAFT_ID",
-    "resource_id": "STICKER_RESOURCE_ID",
-    "start": 0,
-    "duration": 3.0,
-    "transform_x": 0,
-    "transform_y": 0,
-    "scale_x": 1,
-    "scale_y": 1,
-    "track_name": "sticker"
-  }'
-
-# 📋 Chi Tiết Tham Số
-# 🔴 BẮT BUỘC (Required)
-# | Tham số     | Kiểu   | Mô tả                                  |
-# | draft_id    | string | ID draft từ /create_draft.             |
-# | resource_id | string | Resource ID của sticker (từ template). |
-
-
-# ====================================================================================================
-# ✍️ TEXT ENDPOINTS
-# ====================================================================================================
-
-
-# ----------------------------------------------------------------------------------------------------
-# ✍️ API: Thêm Text (`/add_text`)
-# ----------------------------------------------------------------------------------------------------
-# API này thêm text/chữ vào draft với đầy đủ style, border, background, shadow.
-
-# 🔌 Endpoint Info
-# | Method | URL                          |
-# | POST   | http://localhost:8000/add_text |
-
-# 💻 cURL Request (Full Options)
-curl -X POST http://localhost:8000/add_text \
-  -H "Content-Type: application/json" \
-  -d '{
-    "draft_id": "YOUR_DRAFT_ID",
-    "text": "Hello World! 🎉",
-    "start": 0,
-    "duration": 5,
-    "font": null,
-    "font_size": 8.0,
-    "font_color": "#FFFF00",
-    "transform_x": 0,
-    "transform_y": -0.7,
-    "bold": false,
-    "italic": false,
-    "underline": false,
-    "vertical": false,
-    "align": 1,
-    "letter_spacing": 0,
-    "line_spacing": 0,
-    "auto_wrapping": true,
-    "max_line_width": 0.82,
-    "alpha": 1.0,
-    "border": {"color": "#000000", "alpha": 1.0, "width": 40},
-    "background": {"color": "#000000", "alpha": 0.5, "style": 1, "round_radius": 0.1},
-    "shadow": {"color": "#000000", "alpha": 0.8, "diffuse": 15, "distance": 5, "angle": -45},
-    "track_name": null
-  }'
-
-# 📋 Chi Tiết Tham Số
-# 🔴 BẮT BUỘC (Required)
-# | Tham số  | Kiểu   | Mô tả                        |
-# | draft_id | string | ID draft từ /create_draft.   |
-# | text     | string | Nội dung text cần hiển thị.  |
-
-# 🟡 TIMING
-# | Tham số  | Default | Mô tả                          |
-# | start    | 0       | Thời điểm bắt đầu (giây).      |
-# | duration | 5       | Thời lượng hiển thị (giây).    |
-
-# 🟢 FONT STYLE
-# | Tham số        | Default   | Mô tả                                        |
-# | font           | null      | Tên font. Gọi /get_font_types để xem.        |
-# | font_size      | 8.0       | Kích thước font.                             |
-# | font_color     | "#FFFFFF" | Màu chữ (hex color).                         |
-# | bold           | false     | Chữ đậm.                                     |
-# | italic         | false     | Chữ nghiêng.                                 |
-# | underline      | false     | Chữ gạch chân.                               |
-# | alpha          | 1.0       | Độ trong suốt (0.0-1.0).                     |
-# | align          | 0         | Căn lề: 0=trái, 1=giữa, 2=phải.              |
-# | letter_spacing | 0         | Khoảng cách giữa các chữ.                    |
-# | line_spacing   | 0         | Khoảng cách giữa các dòng.                   |
-# | auto_wrapping  | false     | Tự động xuống dòng.                          |
-# | max_line_width | 0.82      | Chiều rộng dòng tối đa (0.0-1.0).            |
-
-# 🔵 BORDER (object, optional - viền chữ)
-# | Tham số | Default   | Mô tả                      |
-# | color   | "#000000" | Màu viền (hex).            |
-# | alpha   | 1.0       | Độ trong suốt (0.0-1.0).   |
-# | width   | 40        | Độ dày viền (0-100).       |
-
-# 🟣 BACKGROUND (object, optional - nền chữ)
-# | Tham số           | Default   | Mô tả                             |
-# | color             | "#000000" | Màu nền (hex).                    |
-# | alpha             | 1.0       | Độ trong suốt (0.0-1.0).          |
-# | style             | 1         | Kiểu nền (1 hoặc 2).              |
-# | round_radius      | 0         | Bo góc (0.0-1.0).                 |
-# | height            | 0.14      | Chiều cao (0.0-1.0).              |
-# | width             | 0.14      | Chiều rộng (0.0-1.0).             |
-# | horizontal_offset | 0.5       | Vị trí ngang (0.0-1.0).           |
-# | vertical_offset   | 0.5       | Vị trí dọc (0.0-1.0).             |
-
-# ⚫ SHADOW (object, optional - bóng chữ)
-# | Tham số  | Default   | Mô tả                       |
-# | color    | "#000000" | Màu bóng (hex).             |
-# | alpha    | 1.0       | Độ trong suốt (0.0-1.0).    |
-# | diffuse  | 15        | Độ mờ (0-100).              |
-# | distance | 5         | Khoảng cách (0-100).        |
-# | angle    | -45       | Góc bóng (-180 - 180).      |
-
-
-# ----------------------------------------------------------------------------------------------------
-# 📝 API: Thêm Subtitle từ SRT (`/add_subtitle`)
-# ----------------------------------------------------------------------------------------------------
-# API này import phụ đề từ file SRT vào draft.
-
-# 🔌 Endpoint Info
-# | Method | URL                              |
-# | POST   | http://localhost:8000/add_subtitle |
-
-# 💻 cURL Request (Full Options)
-curl -X POST http://localhost:8000/add_subtitle \
-  -H "Content-Type: application/json" \
-  -d '{
-    "draft_id": "YOUR_DRAFT_ID",
-    "srt_path": "F:\\Subtitles\\my_subtitles.srt",
-    "font_size": 5.0,
-    "font_color": "#FFFFFF",
-    "transform_y": -0.8,
-    "time_offset": 0,
-    "track_name": "subtitle"
-  }'
-
-
-# ----------------------------------------------------------------------------------------------------
-# 🎭 API: Thêm Text Animation (`/add_text_animation`)
-# ----------------------------------------------------------------------------------------------------
-# API này thêm animation vào/ra/lặp cho text segment.
-# Lưu ý: Nếu dùng loop animation, hãy thêm intro/outro trước, rồi mới thêm loop.
-
-# 🔌 Endpoint Info
-# | Method | URL                                   |
-# | POST   | http://localhost:8000/add_text_animation |
-
-# 💻 cURL Request (Intro animation)
-curl -X POST http://localhost:8000/add_text_animation \
-  -H "Content-Type: application/json" \
-  -d '{
-    "draft_id": "YOUR_DRAFT_ID",
-    "animation_type": "放大",
-    "animation_category": "intro",
-    "segment_index": 0,
-    "duration": 0.5,
-    "track_name": null
-  }'
-
-# 💻 cURL Request (Loop animation)
-curl -X POST http://localhost:8000/add_text_animation \
-  -H "Content-Type: application/json" \
-  -d '{
-    "draft_id": "YOUR_DRAFT_ID",
-    "animation_type": "闪烁",
-    "animation_category": "loop",
-    "segment_index": 0
-  }'
-
-# 📋 Chi Tiết Tham Số
-# 🔴 BẮT BUỘC (Required)
-# | Tham số        | Kiểu   | Mô tả                                                                 |
-# | draft_id       | string | ID draft từ /create_draft.                                            |
-# | animation_type | string | Tên animation. Gọi endpoint tương ứng theo category.                  |
-
-# 🟡 OPTIONAL
-# | Tham số            | Default | Mô tả                                                                    |
-# | animation_category | "intro" | Loại: "intro", "outro", hoặc "loop".                                     |
-# | segment_index      | 0       | Index của text segment (0-based).                                        |
-# | duration           | default | Thời lượng (giây). Không dùng cho loop.                                  |
-
-# 📌 Lấy danh sách animations:
-# - Intro: GET /get_text_intro_types
-# - Outro: GET /get_text_outro_types
-# - Loop:  GET /get_text_loop_types
-
-
-# ====================================================================================================
-# ✨ EFFECTS ENDPOINTS
-# ====================================================================================================
-
-
-# ----------------------------------------------------------------------------------------------------
-# ✨ API: Thêm Effect (`/add_effect`)
-# ----------------------------------------------------------------------------------------------------
-# API này thêm hiệu ứng video vào draft.
-
-# 🔌 Endpoint Info
-# | Method | URL                            |
-# | POST   | http://localhost:8000/add_effect |
-
-# 💻 cURL Request (Full Options)
-curl -X POST http://localhost:8000/add_effect \
-  -H "Content-Type: application/json" \
-  -d '{
-    "draft_id": "YOUR_DRAFT_ID",
-    "effect_type": "Gold_Sparkles",
-    "effect_category": "scene",
-    "start": 0,
-    "duration": 3.0,
-    "params": null,
-    "track_name": "effect_01"
-  }'
-
-# 📋 Chi Tiết Tham Số
-# 🔴 BẮT BUỘC (Required)
-# | Tham số     | Kiểu   | Mô tả                                                    |
-# | draft_id    | string | ID draft từ /create_draft.                               |
-# | effect_type | string | Tên effect. Gọi /get_video_scene_effect_types để xem.    |
-
-# 🟡 OPTIONAL
-# | Tham số         | Default     | Mô tả                                     |
-# | effect_category | "scene"     | Loại effect: "scene" hoặc "character".    |
-# | start           | 0           | Thời điểm bắt đầu (giây).                 |
-# | duration        | 3.0         | Thời lượng effect (giây).                 |
-# | params          | null        | Danh sách tham số effect (0-100).         |
-
-
-# ----------------------------------------------------------------------------------------------------
-# 🎨 API: Thêm Filter (`/add_filter`)
-# ----------------------------------------------------------------------------------------------------
-# API này thêm bộ lọc màu (filter) vào draft.
-
-# 🔌 Endpoint Info
-# | Method | URL                            |
-# | POST   | http://localhost:8000/add_filter |
-
-# 💻 cURL Request
-curl -X POST http://localhost:8000/add_filter \
-  -H "Content-Type: application/json" \
-  -d '{
-    "draft_id": "YOUR_DRAFT_ID",
-    "filter_type": "BW_2",
-    "start": 0,
-    "duration": 5.0,
-    "intensity": 80,
-    "track_name": "filter_01"
-  }'
-
-# 📋 Chi Tiết Tham Số
-# 🔴 BẮT BUỘC (Required)
-# | Tham số     | Kiểu   | Mô tả                                       |
-# | draft_id    | string | ID draft từ /create_draft.                  |
-# | filter_type | string | Tên filter. Gọi /get_filter_types để xem.   |
-
-# 🟡 OPTIONAL
-# | Tham số    | Default     | Mô tả                              |
-# | start      | 0           | Thời điểm bắt đầu (giây).          |
-# | duration   | 3.0         | Thời lượng filter (giây).          |
-# | intensity  | 100         | Cường độ filter (0-100).           |
-# | track_name | "filter_01" | Tên track filter.                  |
-
-
-# ----------------------------------------------------------------------------------------------------
-# 🔀 API: Thêm Transition (`/add_transition`)
-# ----------------------------------------------------------------------------------------------------
-# API này thêm chuyển cảnh (transition) vào cuối một video segment.
-
-# 🔌 Endpoint Info
-# | Method | URL                                |
-# | POST   | http://localhost:8000/add_transition |
-
-# 💻 cURL Request
-curl -X POST http://localhost:8000/add_transition \
-  -H "Content-Type: application/json" \
-  -d '{
-    "draft_id": "YOUR_DRAFT_ID",
-    "transition_type": "White_Flash",
-    "segment_index": 0,
-    "duration": 0.5,
-    "track_name": null
-  }'
-
-# 📋 Chi Tiết Tham Số
-# 🔴 BẮT BUỘC (Required)
-# | Tham số         | Kiểu   | Mô tả                                             |
-# | draft_id        | string | ID draft từ /create_draft.                        |
-# | transition_type | string | Tên transition. Gọi /get_transition_types.        |
-
-# 🟡 OPTIONAL
-# | Tham số       | Default | Mô tả                                            |
-# | segment_index | 0       | Index của video segment (0-based).               |
-# | duration      | default | Thời lượng transition (giây).                    |
-
-# ⚠️ LƯU Ý: Transition được thêm vào CUỐI segment để chuyển sang segment TIẾP THEO.
-
-
-# ----------------------------------------------------------------------------------------------------
-# ▶️ API: Thêm Intro Animation (`/add_intro`)
-# ----------------------------------------------------------------------------------------------------
-# API này thêm animation xuất hiện (intro) cho video segment.
-
-# 🔌 Endpoint Info
-# | Method | URL                           |
-# | POST   | http://localhost:8000/add_intro |
-
-# 💻 cURL Request
-curl -X POST http://localhost:8000/add_intro \
-  -H "Content-Type: application/json" \
-  -d '{
-    "draft_id": "YOUR_DRAFT_ID",
-    "intro_type": "渐显",
-    "segment_index": 0,
-    "duration": 0.5,
-    "track_name": null
-  }'
-
-# 📋 Chi Tiết Tham Số
-# 🔴 BẮT BUỘC (Required)
-# | Tham số    | Kiểu   | Mô tả                                                 |
-# | draft_id   | string | ID draft từ /create_draft.                            |
-# | intro_type | string | Tên intro animation. Gọi /get_intro_animation_types.  |
-
-
-# ----------------------------------------------------------------------------------------------------
-# ◀️ API: Thêm Outro Animation (`/add_outro`)
-# ----------------------------------------------------------------------------------------------------
-# API này thêm animation biến mất (outro) cho video segment.
-
-# 🔌 Endpoint Info
-# | Method | URL                           |
-# | POST   | http://localhost:8000/add_outro |
-
-# 💻 cURL Request
-curl -X POST http://localhost:8000/add_outro \
-  -H "Content-Type: application/json" \
-  -d '{
-    "draft_id": "YOUR_DRAFT_ID",
-    "outro_type": "渐隐",
-    "segment_index": 0,
-    "duration": 0.5,
-    "track_name": null
-  }'
-
-# 📋 Chi Tiết Tham Số
-# 🔴 BẮT BUỘC (Required)
-# | Tham số    | Kiểu   | Mô tả                                                 |
-# | draft_id   | string | ID draft từ /create_draft.                            |
-# | outro_type | string | Tên outro animation. Gọi /get_outro_animation_types.  |
-
-
-# ----------------------------------------------------------------------------------------------------
-# 🎭 API: Thêm Mask (`/add_mask`)
-# ----------------------------------------------------------------------------------------------------
-# API này thêm mask (mặt nạ) cho video segment với đầy đủ tham số transform.
-
-# 🔌 Endpoint Info
-# | Method | URL                          |
-# | POST   | http://localhost:8000/add_mask |
-
-# 💻 cURL Request (Full Options)
-curl -X POST http://localhost:8000/add_mask \
-  -H "Content-Type: application/json" \
-  -d '{
-    "draft_id": "YOUR_DRAFT_ID",
-    "mask_type": "圆形",
-    "segment_index": 0,
-    "center_x": 0,
-    "center_y": 0,
-    "size": 0.5,
-    "rotation": 0,
-    "feather": 20,
-    "invert": false,
-    "rect_width": null,
-    "round_corner": null,
-    "track_name": null
-  }'
-
-# 📋 Chi Tiết Tham Số
-# 🔴 BẮT BUỘC (Required)
-# | Tham số   | Kiểu   | Mô tả                                    |
-# | draft_id  | string | ID draft từ /create_draft.               |
-# | mask_type | string | Tên mask. Gọi /get_mask_types để xem.    |
-
-# 🟡 OPTIONAL
-# | Tham số       | Default | Mô tả                                             |
-# | segment_index | 0       | Index của video segment (0-based).                |
-# | center_x      | 0       | Vị trí tâm X (pixels). 0 = giữa.                  |
-# | center_y      | 0       | Vị trí tâm Y (pixels). 0 = giữa.                  |
-# | size          | 0.5     | Kích thước (0.0-1.0, tỉ lệ chiều cao material).   |
-# | rotation      | 0       | Xoay (độ).                                        |
-# | feather       | 0       | Độ mờ viền (0-100).                               |
-# | invert        | false   | Đảo ngược mask.                                   |
-# | rect_width    | null    | Chiều rộng (chỉ cho mask 矩形/rectangle).         |
-# | round_corner  | null    | Bo góc (0-100, chỉ cho mask 矩形/rectangle).      |
-
-
-# ----------------------------------------------------------------------------------------------------
-# 🔊 API: Thêm Audio Effect (`/add_audio_effect`)
-# ----------------------------------------------------------------------------------------------------
-# API này thêm hiệu ứng âm thanh cho audio segment.
-
-# 🔌 Endpoint Info
-# | Method | URL                                  |
-# | POST   | http://localhost:8000/add_audio_effect |
-
-# 💻 cURL Request
-curl -X POST http://localhost:8000/add_audio_effect \
-  -H "Content-Type: application/json" \
-  -d '{
-    "draft_id": "YOUR_DRAFT_ID",
-    "effect_type": "Echo",
-    "segment_index": 0,
-    "params": null,
-    "track_name": null
-  }'
-
-# 📋 Chi Tiết Tham Số
-# 🔴 BẮT BUỘC (Required)
-# | Tham số     | Kiểu   | Mô tả                                          |
-# | draft_id    | string | ID draft từ /create_draft.                     |
-# | effect_type | string | Tên effect. Gọi /get_audio_effect_types.       |
-
-
-# ----------------------------------------------------------------------------------------------------
-# 🔈 API: Thêm Audio Fade (`/add_audio_fade`)
-# ----------------------------------------------------------------------------------------------------
-# API này thêm hiệu ứng fade in/out cho audio segment.
-
-# 🔌 Endpoint Info
-# | Method | URL                                |
-# | POST   | http://localhost:8000/add_audio_fade |
-
-# 💻 cURL Request
-curl -X POST http://localhost:8000/add_audio_fade \
-  -H "Content-Type: application/json" \
-  -d '{
-    "draft_id": "YOUR_DRAFT_ID",
-    "fade_in": 1.0,
-    "fade_out": 2.0,
-    "segment_index": 0,
-    "track_name": null
-  }'
-
-# 📋 Chi Tiết Tham Số
-# 🔴 BẮT BUỘC (Required)
-# | Tham số  | Kiểu   | Mô tả                      |
-# | draft_id | string | ID draft từ /create_draft. |
-
-# 🟡 OPTIONAL (ít nhất 1 trong fade_in/fade_out > 0)
-# | Tham số       | Default | Mô tả                              |
-# | fade_in       | 0       | Thời lượng fade in (giây).         |
-# | fade_out      | 0       | Thời lượng fade out (giây).        |
-# | segment_index | 0       | Index của audio segment (0-based). |
-
-
-# ----------------------------------------------------------------------------------------------------
-# � API: Thêm Video Fade (`/add_video_fade`)
-# ----------------------------------------------------------------------------------------------------
-# API này thêm hiệu ứng fade in/out cho audio của video segment.
-
-# 🔌 Endpoint Info
-# | Method | URL                                |
-# | POST   | http://localhost:8000/add_video_fade |
-
-# 💻 cURL Request
-curl -X POST http://localhost:8000/add_video_fade \
-  -H "Content-Type: application/json" \
-  -d '{
-    "draft_id": "YOUR_DRAFT_ID",
-    "fade_in": 1.0,
-    "fade_out": 2.0,
-    "segment_index": 0,
-    "track_name": null
-  }'
-
-# 📋 Chi Tiết Tham Số
-# 🔴 BẮT BUỘC (Required)
-# | Tham số  | Kiểu   | Mô tả                      |
-# | draft_id | string | ID draft từ /create_draft. |
-
-
-# ----------------------------------------------------------------------------------------------------
-# 🖼️ API: Thêm Background Filling (`/add_background_filling`)
-# ----------------------------------------------------------------------------------------------------
-# API này thêm nền (blur hoặc màu) cho video segment khi video không phủ kín canvas.
-
-# 🔌 Endpoint Info
-# | Method | URL                                       |
-# | POST   | http://localhost:8000/add_background_filling |
-
-# 💻 cURL Request (Blur background)
-curl -X POST http://localhost:8000/add_background_filling \
-  -H "Content-Type: application/json" \
-  -d '{
-    "draft_id": "YOUR_DRAFT_ID",
-    "fill_type": "blur",
-    "blur": 0.375,
-    "segment_index": 0
-  }'
-
-# 💻 cURL Request (Color background)
-curl -X POST http://localhost:8000/add_background_filling \
-  -H "Content-Type: application/json" \
-  -d '{
-    "draft_id": "YOUR_DRAFT_ID",
-    "fill_type": "color",
-    "color": "#000000FF",
-    "segment_index": 0
-  }'
-
-# 📋 Chi Tiết Tham Số
-# 🔴 BẮT BUỘC (Required)
-# | Tham số   | Kiểu   | Mô tả                             |
-# | draft_id  | string | ID draft từ /create_draft.        |
-# | fill_type | string | 'blur' hoặc 'color'.              |
-
-# 🟡 OPTIONAL
-# | Tham số       | Default      | Mô tả                                                  |
-# | blur          | 0.0625       | Độ blur (0.0-1.0). CapCut: 0.0625, 0.375, 0.75, 1.0    |
-# | color         | '#00000000'  | Màu nền format '#RRGGBBAA'.                            |
-# | segment_index | 0            | Index của video segment (0-based).                     |
-
-
-# ----------------------------------------------------------------------------------------------------
-# 🎬 API: Thêm Video Effect trực tiếp vào Segment (`/add_video_effect`)
-# ----------------------------------------------------------------------------------------------------
-# API này thêm effect trực tiếp vào video segment (thay vì dùng effect track).
-
-# 🔌 Endpoint Info
-# | Method | URL                                  |
-# | POST   | http://localhost:8000/add_video_effect |
-
-# 💻 cURL Request
-curl -X POST http://localhost:8000/add_video_effect \
-  -H "Content-Type: application/json" \
-  -d '{
-    "draft_id": "YOUR_DRAFT_ID",
-    "effect_type": "Beat_Shots",
-    "effect_category": "scene",
-    "segment_index": 0,
-    "params": null
-  }'
-
-# 📋 Chi Tiết Tham Số
-# 🔴 BẮT BUỘC (Required)
-# | Tham số     | Kiểu   | Mô tả                                             |
-# | draft_id    | string | ID draft từ /create_draft.                        |
-# | effect_type | string | Tên effect. Gọi /get_video_scene_effect_types.    |
-
-# 🟡 OPTIONAL
-# | Tham số         | Default | Mô tả                                          |
-# | effect_category | 'scene' | 'scene' hoặc 'character'.                      |
-# | segment_index   | 0       | Index của video segment (0-based).             |
-# | params          | null    | Tham số effect (0-100).                        |
-
-
-# ----------------------------------------------------------------------------------------------------
-# �🎤 API: Thêm Tone Effect - Voice Changer (`/add_tone_effect`)
-# ----------------------------------------------------------------------------------------------------
-# API này thêm hiệu ứng thay đổi giọng nói (voice changer) cho audio segment.
-# Ví dụ: 大叔 (Uncle), 女生 (Girl), 机器人 (Robot), 萝莉 (Loli), 花栗鼠 (Chipmunk)
-
-# 🔌 Endpoint Info
-# | Method | URL                                 |
-# | POST   | http://localhost:8000/add_tone_effect |
-
-# 💻 cURL Request
-curl -X POST http://localhost:8000/add_tone_effect \
-  -H "Content-Type: application/json" \
-  -d '{
-    "draft_id": "YOUR_DRAFT_ID",
-    "effect_type": "机器人",
-    "segment_index": 0,
-    "params": null,
-    "track_name": null
-  }'
-
-# 📋 Chi Tiết Tham Số
-# 🔴 BẮT BUỘC (Required)
-# | Tham số     | Kiểu   | Mô tả                                             |
-# | draft_id    | string | ID draft từ /create_draft.                        |
-# | effect_type | string | Tên tone effect. Gọi /get_tone_effect_types.      |
-
-# 🟡 OPTIONAL
-# | Tham số       | Default | Mô tả                              |
-# | segment_index | 0       | Index của audio segment (0-based). |
-# | params        | null    | Tham số effect (0-100).            |
-
-
-# ----------------------------------------------------------------------------------------------------
-# 🎵 API: Thêm Speech To Song Effect (`/add_speech_to_song`)
-# ----------------------------------------------------------------------------------------------------
-# API này thêm hiệu ứng chuyển lời nói thành bài hát cho audio segment.
-# Ví dụ: Lofi, 民谣 (Folk), 嘻哈 (Hip-hop), 爵士 (Jazz), 节奏蓝调 (R&B)
-
-# 🔌 Endpoint Info
-# | Method | URL                                     |
-# | POST   | http://localhost:8000/add_speech_to_song |
-
-# 💻 cURL Request
-curl -X POST http://localhost:8000/add_speech_to_song \
-  -H "Content-Type: application/json" \
-  -d '{
-    "draft_id": "YOUR_DRAFT_ID",
-    "effect_type": "Lofi",
-    "segment_index": 0,
-    "params": null,
-    "track_name": null
-  }'
-
-# 📋 Chi Tiết Tham Số
-# 🔴 BẮT BUỘC (Required)
-# | Tham số     | Kiểu   | Mô tả                                                 |
-# | draft_id    | string | ID draft từ /create_draft.                            |
-# | effect_type | string | Tên speech-to-song. Gọi /get_speech_to_song_types.    |
-
-
-# ====================================================================================================
-# 📚 METADATA QUERY ENDPOINTS - Lấy danh sách các loại hiệu ứng, font, animation
-# ====================================================================================================
-
-# 🔤 Lấy danh sách Font
-curl -X GET http://localhost:8000/get_font_types
-
-# 🎨 Lấy danh sách Filter
-curl -X GET http://localhost:8000/get_filter_types
-
-# 🎭 Lấy danh sách Mask
-curl -X GET http://localhost:8000/get_mask_types
-
-# 🎬 Lấy danh sách Transition (chuyển cảnh)
-curl -X GET http://localhost:8000/get_transition_types
-
-# ▶️ Lấy danh sách Intro Animation (animation vào)
-curl -X GET http://localhost:8000/get_intro_animation_types
-
-# ◀️ Lấy danh sách Outro Animation (animation ra)
-curl -X GET http://localhost:8000/get_outro_animation_types
-
-# 🔄 Lấy danh sách Combo Animation
-curl -X GET http://localhost:8000/get_combo_animation_types
-
-# 📝 Lấy danh sách Text Intro Animation
-curl -X GET http://localhost:8000/get_text_intro_types
-
-# 📝 Lấy danh sách Text Outro Animation
-curl -X GET http://localhost:8000/get_text_outro_types
-
-# 🔁 Lấy danh sách Text Loop Animation
-curl -X GET http://localhost:8000/get_text_loop_types
-
-# 🎬 Lấy danh sách Video Scene Effects
-curl -X GET http://localhost:8000/get_video_scene_effect_types
-
-# 👤 Lấy danh sách Video Character Effects
-curl -X GET http://localhost:8000/get_video_character_effect_types
-
-# 🔊 Lấy danh sách Audio Effects
-curl -X GET http://localhost:8000/get_audio_effect_types
-
-# 🎤 Lấy danh sách Tone Effects (Voice Changer - thay đổi giọng nói)
-# Response bao gồm: name, is_vip (true/false)
-# Ví dụ: 大叔 (Uncle), 女生 (Girl), 机器人 (Robot), 萝莉 (Loli), etc.
-curl -X GET http://localhost:8000/get_tone_effect_types
-
-# 🎵 Lấy danh sách Speech To Song Types (Chuyển lời nói thành bài hát)
-# Response bao gồm: name, is_vip (true/false)
-# Ví dụ: Lofi, 民谣 (Folk), 嘻哈 (Hip-hop), 爵士 (Jazz), etc.
-curl -X GET http://localhost:8000/get_speech_to_song_types
-
-
-# ====================================================================================================
-# 🚀 WORKFLOW MẪU - Tạo video hoàn chỉnh với đầy đủ hiệu ứng
-# ====================================================================================================
-
-# Bước 1: Tạo draft mới
-curl -X POST http://localhost:8000/create_draft \
-  -H "Content-Type: application/json" \
-  -d '{"draft_name": "my_project", "width": 1920, "height": 1080}'
-# → Lấy draft_id từ response
-
-# Bước 2: Thêm video chính
-curl -X POST http://localhost:8000/add_video \
-  -H "Content-Type: application/json" \
-  -d '{"draft_id": "YOUR_DRAFT_ID", "video_path": "F:\\Videos\\main.mp4"}'
-
-# Bước 3: Thêm intro animation cho video
-curl -X POST http://localhost:8000/add_intro \
-  -H "Content-Type: application/json" \
-  -d '{"draft_id": "YOUR_DRAFT_ID", "intro_type": "渐显", "duration": 0.5}'
-
-# Bước 4: Thêm outro animation cho video
-curl -X POST http://localhost:8000/add_outro \
-  -H "Content-Type: application/json" \
-  -d '{"draft_id": "YOUR_DRAFT_ID", "outro_type": "渐隐", "duration": 0.5}'
-
-# Bước 5: Thêm filter
-curl -X POST http://localhost:8000/add_filter \
-  -H "Content-Type: application/json" \
-  -d '{"draft_id": "YOUR_DRAFT_ID", "filter_type": "BW_2", "start": 0, "duration": 10, "intensity": 50}'
-
-# Bước 6: Thêm effect
-curl -X POST http://localhost:8000/add_effect \
-  -H "Content-Type: application/json" \
-  -d '{"draft_id": "YOUR_DRAFT_ID", "effect_type": "Shake", "start": 2, "duration": 3}'
-
-# Bước 7: Thêm nhạc nền
-curl -X POST http://localhost:8000/add_audio \
-  -H "Content-Type: application/json" \
-  -d '{"draft_id": "YOUR_DRAFT_ID", "audio_path": "F:\\Audio\\bgm.mp3", "volume": 0.5}'
-
-# Bước 8: Thêm audio fade
-curl -X POST http://localhost:8000/add_audio_fade \
-  -H "Content-Type: application/json" \
-  -d '{"draft_id": "YOUR_DRAFT_ID", "fade_in": 1.0, "fade_out": 2.0}'
-
-# Bước 9: Thêm text tiêu đề
-curl -X POST http://localhost:8000/add_text \
-  -H "Content-Type: application/json" \
-  -d '{"draft_id": "YOUR_DRAFT_ID", "text": "My Video Title", "start": 0, "duration": 3, "font_size": 12, "font_color": "#FFFF00"}'
-
-# Bước 10: Thêm text animation
-curl -X POST http://localhost:8000/add_text_animation \
-  -H "Content-Type: application/json" \
-  -d '{"draft_id": "YOUR_DRAFT_ID", "animation_type": "放大", "animation_category": "intro"}'
-
-# Bước 11: Thêm transition (nếu có nhiều video)
-# (Thêm video thứ 2 trước, sau đó thêm transition vào video thứ 1)
-
-# Bước 12: Lấy thông tin draft
-curl -X POST http://localhost:8000/get_draft_info \
-  -H "Content-Type: application/json" \
-  -d '{"draft_id": "YOUR_DRAFT_ID"}'
-
-# Bước 13: Lưu draft
-curl -X POST http://localhost:8000/save_draft \
-  -H "Content-Type: application/json" \
-  -d '{"draft_id": "YOUR_DRAFT_ID"}'
-
-# Bước 14: Mở CapCut và tìm draft "my_project" trong Projects
-
-
-# ====================================================================================================
-# 🎞️ KEYFRAME ENDPOINTS
-# ====================================================================================================
-
-
-# ----------------------------------------------------------------------------------------------------
-# 🎞️ API: Thêm Keyframe (`/add_keyframe`)
-# ----------------------------------------------------------------------------------------------------
-# API này thêm keyframe animation vào video/image segment.
-
-# 🔌 Endpoint Info
-# | Method | URL                               |
-# | POST   | http://localhost:8000/add_keyframe |
-
-# 💻 cURL Request (Full Options)
-curl -X POST http://localhost:8000/add_keyframe \
-  -H "Content-Type: application/json" \
-  -d '{
-    "draft_id": "YOUR_DRAFT_ID",
-    "property": "rotation",
-    "time_offset": 0,
-    "value": 0,
-    "segment_index": 0,
-    "track_name": null
-  }'
-
-# 📋 Chi Tiết Tham Số
-# 🔴 BẮT BUỘC (Required)
-# | Tham số     | Kiểu   | Mô tả                                           |
-# | draft_id    | string | ID draft từ /create_draft.                      |
-# | property    | string | Tên thuộc tính keyframe.                        |
-# | time_offset | float  | Thời gian từ đầu segment (giây).                |
-# | value       | float  | Giá trị tại keyframe.                           |
-
-# 🟡 OPTIONAL
-# | Tham số       | Default | Mô tả                              |
-# | segment_index | 0       | Index của video segment (0-based). |
-# | track_name    | null    | Tên video track.                   |
-
-# 📌 Các thuộc tính keyframe hỗ trợ:
-# | Thuộc tính    | Mô tả                                    | Áp dụng      |
-# | position_x    | Vị trí ngang (-1 đến 1)                  | Video/Image  |
-# | position_y    | Vị trí dọc (-1 đến 1)                    | Video/Image  |
-# | rotation      | Góc xoay (độ, chiều kim đồng hồ)         | Video/Image  |
-# | scale_x       | Tỷ lệ ngang                              | Video/Image  |
-# | scale_y       | Tỷ lệ dọc                                | Video/Image  |
-# | uniform_scale | Tỷ lệ đồng nhất X/Y                      | Video/Image  |
-# | alpha         | Độ trong suốt (0-1)                      | Video        |
-# | saturation    | Độ bão hòa (-1 đến 1)                    | Video        |
-# | contrast      | Độ tương phản (-1 đến 1)                 | Video        |
-# | brightness    | Độ sáng (-1 đến 1)                       | Video        |
-# | volume        | Âm lượng                                 | Video/Audio  |
-
-# 💡 Ví dụ: Xoay video từ 0° đến 360° trong 4 giây
-curl -X POST http://localhost:8000/add_keyframe \
-  -H "Content-Type: application/json" \
-  -d '{"draft_id": "ID", "property": "rotation", "time_offset": 0, "value": 0}'
-
-curl -X POST http://localhost:8000/add_keyframe \
-  -H "Content-Type: application/json" \
-  -d '{"draft_id": "ID", "property": "rotation", "time_offset": 4, "value": 360}'
-
-
-# ----------------------------------------------------------------------------------------------------
-# 📋 API: Lấy Danh Sách Keyframe Properties (`/get_keyframe_properties`)
-# ----------------------------------------------------------------------------------------------------
-# API này trả về danh sách các thuộc tính keyframe có thể sử dụng.
-
-# 🔌 Endpoint Info
-# | Method | URL                                        |
-# | GET    | http://localhost:8000/get_keyframe_properties |
-
-# 💻 cURL Request
-curl -X GET http://localhost:8000/get_keyframe_properties
-
-
-# ====================================================================================================
-# 💡 WINDOWS POWERSHELL EXAMPLES
-# ====================================================================================================
-
-# 📁 Tạo Draft mới (PowerShell)
-Invoke-RestMethod -Uri "http://localhost:8000/create_draft" -Method POST -ContentType "application/json" -Body '{"draft_name": "ps_demo", "width": 1920, "height": 1080}'
-
-# 🎬 Thêm Video (PowerShell)
-Invoke-RestMethod -Uri "http://localhost:8000/add_video" -Method POST -ContentType "application/json" -Body '{"draft_id": "YOUR_DRAFT_ID", "video_path": "F:\\Videos\\test.mp4"}'
-
-# ✍️ Thêm Text (PowerShell)
-Invoke-RestMethod -Uri "http://localhost:8000/add_text" -Method POST -ContentType "application/json" -Body '{"draft_id": "YOUR_DRAFT_ID", "text": "Hello from PowerShell!", "font_color": "#00FF00"}'
-
-# 🎨 Thêm Filter (PowerShell)
-Invoke-RestMethod -Uri "http://localhost:8000/add_filter" -Method POST -ContentType "application/json" -Body '{"draft_id": "YOUR_DRAFT_ID", "filter_type": "BW_2", "intensity": 80}'
-
-# ▶️ Thêm Intro Animation (PowerShell)
-Invoke-RestMethod -Uri "http://localhost:8000/add_intro" -Method POST -ContentType "application/json" -Body '{"draft_id": "YOUR_DRAFT_ID", "intro_type": "渐显"}'
-
-# ◀️ Thêm Outro Animation (PowerShell)
-Invoke-RestMethod -Uri "http://localhost:8000/add_outro" -Method POST -ContentType "application/json" -Body '{"draft_id": "YOUR_DRAFT_ID", "outro_type": "渐隐"}'
-
-# 🔀 Thêm Transition (PowerShell)
-Invoke-RestMethod -Uri "http://localhost:8000/add_transition" -Method POST -ContentType "application/json" -Body '{"draft_id": "YOUR_DRAFT_ID", "transition_type": "White_Flash"}'
-
-# 💾 Lưu Draft (PowerShell)
-Invoke-RestMethod -Uri "http://localhost:8000/save_draft" -Method POST -ContentType "application/json" -Body '{"draft_id": "YOUR_DRAFT_ID"}'
-
-# 🔤 Lấy danh sách Font (PowerShell)
-Invoke-RestMethod -Uri "http://localhost:8000/get_font_types" -Method GET
-
-# 🎨 Lấy danh sách Filter (PowerShell)
-Invoke-RestMethod -Uri "http://localhost:8000/get_filter_types" -Method GET
-
-# 🔀 Lấy danh sách Transition (PowerShell)
-Invoke-RestMethod -Uri "http://localhost:8000/get_transition_types" -Method GET
-
-# ℹ️ Lấy thông tin Draft (PowerShell)
-Invoke-RestMethod -Uri "http://localhost:8000/get_draft_info" -Method POST -ContentType "application/json" -Body '{"draft_id": "YOUR_DRAFT_ID"}'

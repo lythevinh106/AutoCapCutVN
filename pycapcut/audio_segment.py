@@ -124,7 +124,7 @@ class AudioSegment(MediaSegment):
         if source_timerange.end > material.duration:
             raise ValueError(f"截取的素材时间范围 {source_timerange} 超出了素材时长({material.duration})")
 
-        super().__init__(material.material_id, source_timerange, target_timerange, speed, volume)
+        super().__init__(material.material_id, source_timerange, target_timerange, speed, volume, curve_meta=None)
 
         self.material_instance = deepcopy(material)
         self.fade = None

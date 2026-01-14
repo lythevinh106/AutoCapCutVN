@@ -1,5 +1,5 @@
 {
     "port": 8000,
-    "debug": true,
+    "debug": false,
     "draft_folder": "C:\\Users\\VINH\\AppData\\Local\\CapCut\\User Data\\Projects\\com.lveditor.draft"
 }
